@@ -44,6 +44,11 @@ public class Report {
     @Column(name = "square_meters", nullable = false, length = 20)
     private Long square_meters;
 
+    @ManyToOne
+    @JoinColumn(name = "filial_id")
+    @Column(nullable = false)
+    private Filial filial;
+
     @CreatedBy
     @Column(name = "created_by", nullable=false, updatable=false)
     private String createdBy;
@@ -59,9 +64,4 @@ public class Report {
     @LastModifiedBy
     @Column(name = "updated_by")
     private String updatedBy;
-
-    @ManyToOne
-    @JoinColumn(name = "filial_id")
-    @Column(nullable = false)
-    private Filial filial;
 }

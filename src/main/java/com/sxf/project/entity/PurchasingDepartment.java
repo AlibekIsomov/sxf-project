@@ -34,8 +34,8 @@ public class PurchasingDepartment {
     @Column(name = "number", nullable = false)
     private Long number;
 
-    @Column(name = "new_payment", nullable = false)
-    private Long newPayment;
+    @Column(name = "payment")
+    private Long payment;
 
     @ManyToOne
     @JoinColumn(name = "filial_id")
