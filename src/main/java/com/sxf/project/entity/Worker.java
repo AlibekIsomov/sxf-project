@@ -43,12 +43,11 @@ public class Worker {
 
     @ManyToOne
     @JoinColumn(name = "filial_id")
-    @Column(nullable = false)
     private Filial filial;
 
-        @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-        @JoinColumn(name = "file_entity_id")
-        private FileEntity fileEntity;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "file_entity_id")
+    private FileEntity fileEntity;
 
     @CreatedBy
     @Column(name = "created_by", nullable=false, updatable=false)

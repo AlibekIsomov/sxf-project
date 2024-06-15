@@ -42,7 +42,7 @@ public class MonthlySalary {
     @JsonBackReference
     private Worker worker;
 
-    @OneToMany(mappedBy = "monthly_salary", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "monthlySalary", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonBackReference
     @JsonIgnore
     private List<MonthlySalaryPayment> monthlySalaryPayments = new ArrayList<>();

@@ -38,9 +38,8 @@ public class PurchasingDepartment {
     private Long payment;
 
     @ManyToOne
-    @JoinColumn(name = "filial_id")
-    @Column(nullable = false)
-    private Filial filial;
+    @JoinColumn(name = "profilePD_id")
+    private ProfilePD profilePD;
 
     @CreatedBy
     @Column(name = "created_by", nullable=false, updatable=false)

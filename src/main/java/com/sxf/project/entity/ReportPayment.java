@@ -1,5 +1,6 @@
 package com.sxf.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,11 @@ public class ReportPayment {
 
     @Column(name = "new_payment", nullable = false)
     private Long newPayment;
+
+    @ManyToOne
+    @JoinColumn(name = "report_id")
+    @JsonBackReference
+    private Report report;
 
     @CreatedBy
     @Column(name = "created_by", nullable=false, updatable=false)

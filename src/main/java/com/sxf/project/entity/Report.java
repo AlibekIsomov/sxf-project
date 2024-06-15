@@ -1,6 +1,7 @@
 package com.sxf.project.entity;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +15,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -44,9 +47,17 @@ public class Report {
     @Column(name = "square_meters", nullable = false, length = 20)
     private Long square_meters;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
+    private List<ReportPayment> payments = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "file_entity_id")
+    private FileEntity fileEntity;
+
     @ManyToOne
     @JoinColumn(name = "filial_id")
-    @Column(nullable = false)
     private Filial filial;
 
     @CreatedBy

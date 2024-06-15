@@ -15,8 +15,8 @@ public class PurchasingDepartmentDTO {
 
     private Long number;
 
-    private String payment;
+    private Long payment;
 
-    private Long filialId;
+    private Long profileDbId;
 
 }

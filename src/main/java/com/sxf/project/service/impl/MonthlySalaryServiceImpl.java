@@ -108,6 +108,7 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
         return monthlySalaryRepository.findAll(pageable);
     }
 
+    @Override
     public List<MonthlySalary> getMonthlySalariesByWorkerId(Long workerId) {
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new EntityNotFoundException("Worker not found with id: " + workerId));

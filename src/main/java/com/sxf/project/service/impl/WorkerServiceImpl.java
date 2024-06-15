@@ -107,7 +107,7 @@ public class WorkerServiceImpl implements WorkerService {
             return Optional.of(workerRepository.save(worker));
         } else {
             // Handle the case where the worker with the given ID doesn't exist
-            throw new ChangeSetPersister.NotFoundException("Worker not found with ID: ");
+            throw new ChangeSetPersister.NotFoundException();
         }
     }
     @Override
@@ -125,6 +125,7 @@ public class WorkerServiceImpl implements WorkerService {
         monthlySalaryRepository.deleteAll(monthlySalaryRepository.findAllByWorkerId(id));
         workerRepository.deleteById(id);
     }
+
     @Override
     @Transactional
     public Optional<MonthlySalary> createForSchedule(MonthlySalaryDTO data) throws Exception {
