@@ -4,10 +4,10 @@ import com.sxf.project.dto.MonthlySalaryDTO;
 import com.sxf.project.dto.WorkerDTO;
 import com.sxf.project.entity.MonthlySalary;
 import com.sxf.project.entity.Worker;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 public interface WorkerService {

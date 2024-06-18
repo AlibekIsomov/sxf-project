@@ -1,6 +1,5 @@
 package com.sxf.project.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,8 +10,10 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,12 +29,15 @@ public class Filial {
     @Column(name = "name",unique=true, nullable=false , length=120)
     private String name;
 
-    @Column(name = "description",unique=true, length=600)
+    @Column(name = "description", length=600)
     private String description;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "file_entity_id")
     private FileEntity fileEntity;
+
+    @OneToMany(mappedBy = "assignedFilial")
+    private Set<User> managers;
 
     @CreatedBy
     @Column(name = "created_by", nullable=false, updatable=false)

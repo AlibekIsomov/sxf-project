@@ -5,7 +5,6 @@ import com.sxf.project.dto.ReportDTO;
 import com.sxf.project.entity.Report;
 import com.sxf.project.repository.ReportRepository;
 import com.sxf.project.service.ReportService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 

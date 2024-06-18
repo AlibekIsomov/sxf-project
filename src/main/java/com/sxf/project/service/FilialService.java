@@ -5,6 +5,10 @@ import com.sxf.project.entity.Filial;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
+import java.util.List;
 import java.util.Optional;
 
 public interface FilialService {
@@ -18,5 +22,13 @@ public interface FilialService {
 
     Page<Filial> getAllByNameContains(String name, Pageable pageable);
 
+    ByteArrayInputStream exportExcel() throws IOException;
+
     void deleteById(Long id);
+
+    Filial getFilialForUser(Long filialId, Long userId) throws AccessDeniedException;
+
+    List<Filial> getAllFilialsForAdmin(Long adminId) throws AccessDeniedException;
+
+    Filial assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException;
 }

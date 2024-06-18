@@ -7,12 +7,12 @@ import com.sxf.project.entity.ReportPayment;
 import com.sxf.project.repository.ReportPaymentRepository;
 import com.sxf.project.repository.ReportRepository;
 import com.sxf.project.service.ReportPaymentService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
