@@ -4,6 +4,7 @@ package com.sxf.project.controller;
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.entity.Filial;
 import com.sxf.project.repository.FilialRepository;
+import com.sxf.project.response.ResourceNotFoundException;
 import com.sxf.project.service.FilialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -96,11 +97,18 @@ public class FilialController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/assign")
-    public ResponseEntity<Filial> assignFilialToManager(@RequestParam Long filialId, @RequestParam Long managerId) throws AccessDeniedException {
-        Filial assignedFilial = filialService.assignFilialToManager(filialId, managerId);
-        return ResponseEntity.ok(assignedFilial);
+    @PutMapping("/{filialId}/assign-manager/{managerId}")
+    public ResponseEntity<FilialDTO> assignFilialToManager(@PathVariable Long filialId, @PathVariable Long managerId) {
+        try {
+            FilialDTO filialDTO = filialService.assignFilialToManager(filialId, managerId);
+            return ResponseEntity.ok(filialDTO);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(403).body(null);
+        }
     }
+
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @GetMapping("/{filialId}")

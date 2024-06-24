@@ -30,5 +30,6 @@ public interface FilialService {
 
     List<Filial> getAllFilialsForAdmin(Long adminId) throws AccessDeniedException;
 
-    Filial assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException;
+
+    FilialDTO assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException;
 }

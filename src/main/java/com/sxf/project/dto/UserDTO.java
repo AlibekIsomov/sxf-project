@@ -15,6 +15,8 @@ public class UserDTO extends BaseDTO {
     private Set<Role> roles;
     private Boolean active;
 
+    private Long assignedFilialId;
+
     public UserDTO() {
 
     }
@@ -42,6 +44,14 @@ public class UserDTO extends BaseDTO {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public Long getAssignedFilialId() {
+        return assignedFilialId;
+    }
+
+    public void setAssignedFilialId(Long assignedFilialId) {
+        this.assignedFilialId = assignedFilialId;
     }
 
     public String getUsername() {

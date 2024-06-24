@@ -15,6 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -34,6 +36,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userProvider).passwordEncoder(passwordEncoder());
 
+    }
+    @Bean
+    public HttpFirewall customHttpFirewall() {
+        DefaultHttpFirewall firewall = new DefaultHttpFirewall();
+        // Customize the firewall settings as needed
+        firewall.setAllowUrlEncodedSlash(true);
+        return firewall;
     }
 
     @Bean

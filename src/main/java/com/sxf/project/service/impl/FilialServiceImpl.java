@@ -1,6 +1,7 @@
 package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.FilialDTO;
+import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.FileEntity;
 import com.sxf.project.entity.Filial;
 import com.sxf.project.entity.Role;
@@ -21,12 +22,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FilialServiceImpl implements FilialService {
@@ -165,18 +169,60 @@ public class FilialServiceImpl implements FilialService {
         return filialRepository.findAll();
     }
 
+
     @Override
-    public Filial assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException {
-        Filial filial = filialRepository.findById(filialId).orElseThrow(() -> new ResourceNotFoundException("Filial not found"));
-        User manager = userRepository.findById(managerId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    @Transactional
+    public FilialDTO assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException {
+        Filial filial = filialRepository.findByIdWithManagers(filialId)
+                .orElseThrow(() -> new ResourceNotFoundException("Filial not found"));
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!manager.getRoles().contains(Role.MANAGER)) {
             throw new AccessDeniedException("Access is denied");
         }
 
+        // Unassign the manager from any existing filial if necessary
+        if (manager.getAssignedFilial() != null) {
+            manager.getAssignedFilial().getManagers().remove(manager);
+        }
+
+        // Assign the manager to the new filial and update the relationship
         manager.setAssignedFilial(filial);
-        userRepository.save(manager);
-        return filial;
+        filial.getManagers().add(manager);
+
+        userRepository.save(manager); // Save the manager
+        filialRepository.save(filial); // Save the filial
+
+        return convertToDTO(filial);
+    }
+
+    private FilialDTO convertToDTO(Filial filial) {
+        FilialDTO filialDTO = new FilialDTO();
+        filialDTO.setId(filial.getId());
+
+        Set<UserDTO> managerDTOs = filial.getManagers().stream()
+                .map(manager -> {
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setId(manager.getId());
+                    userDTO.setAssignedFilialId(filial.getId());
+                    return userDTO;
+                }).collect(Collectors.toSet());
+
+        filialDTO.setManagers(managerDTOs);
+        return filialDTO;
+    }
+
+    public class ResourceNotFoundException extends RuntimeException {
+        public ResourceNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    public class AccessDeniedException extends RuntimeException {
+        public AccessDeniedException(String message) {
+            super(message);
+        }
     }
 
 }

@@ -1,5 +1,9 @@
 package com.sxf.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +17,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -36,8 +43,10 @@ public class Filial {
     @JoinColumn(name = "file_entity_id")
     private FileEntity fileEntity;
 
-    @OneToMany(mappedBy = "assignedFilial")
-    private Set<User> managers;
+    @OneToMany(mappedBy = "assignedFilial", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonBackReference
+    @JsonIgnore
+    private List<User> managers = new ArrayList<>();
 
     @CreatedBy
     @Column(name = "created_by", nullable=false, updatable=false)

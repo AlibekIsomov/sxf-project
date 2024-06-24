@@ -1,5 +1,7 @@
 package com.sxf.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,8 +43,11 @@ public class User extends DistributedEntity {
 
     private Boolean active;
 
+
     @ManyToOne
     @JoinColumn(name = "filial_id")
+    @JsonBackReference
     private Filial assignedFilial;
+
 }
 
