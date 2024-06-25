@@ -88,6 +88,16 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
+    public Long getTotalFullAmountByProfilePD(Long profilePDId) {
+        return purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePDId);
+    }
+
+    @Override
+    public Long getRemainingPaymentByProfilePD(Long profilePDId) {
+        return purchasingDepartmentRepository.calculateRemainingPaymentByProfilePD(profilePDId);
+    }
+
+    @Override
     public void deleteById(Long id) {
         if(!purchasingDepartmentRepository.existsById(id)) {
             logger.info("ProfilePD with id " + id + " does not exists");

@@ -4,6 +4,7 @@ import com.sxf.project.dto.ReportPaymentDTO;
 import com.sxf.project.entity.ReportPayment;
 import com.sxf.project.repository.ReportPaymentRepository;
 import com.sxf.project.service.ReportPaymentService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +26,14 @@ public class ReportPaymentController {
         double totalPayments = paymentService.calculateTotalPaymentsByReport(reportId);
         return ResponseEntity.ok(totalPayments);
     }
-//
-//    @GetMapping("/release/{reportId}")
-//    public ResponseEntity<Double> releasePaidAmount(
-//            @PathVariable Long reportId,
-//            @RequestParam int fullAmount)
-//    {
-//        double remainingAmount = paymentService.releasePaidAmount(reportId, fullAmount );
-//        return ResponseEntity.ok(remainingAmount);
-//    }
+
+    @GetMapping("/release/{reportId}")
+    public ResponseEntity<Double> releasePaidAmount(
+            @PathVariable Long reportId ) throws NotFoundException {
+        double remainingAmount = paymentService.releasePaidAmount(reportId);
+        return ResponseEntity.ok(remainingAmount);
+    }
+
 
 
     @PostMapping("/{reportId}/add-payment")

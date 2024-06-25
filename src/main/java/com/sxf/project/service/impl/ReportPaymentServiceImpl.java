@@ -7,6 +7,9 @@ import com.sxf.project.entity.ReportPayment;
 import com.sxf.project.repository.ReportPaymentRepository;
 import com.sxf.project.repository.ReportRepository;
 import com.sxf.project.service.ReportPaymentService;
+import javassist.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +20,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
+
 @Service
 public class ReportPaymentServiceImpl implements ReportPaymentService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReportPaymentServiceImpl.class);
 
     @Autowired
     ReportPaymentRepository paymentRepository;
@@ -92,14 +99,27 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
         }
     }
 
-    @Override
-    public double calculateTotalPaymentsByReport(Long reportId){
-        Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
+        @Override
+        public double calculateTotalPaymentsByReport(Long reportId){
+            Report report = reportRepository.findById(reportId)
+                    .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
 
-        return paymentRepository.calculateTotalPaymentsByReport(report);
+            return paymentRepository.calculateTotalPaymentsByReport(report);
+        }
+
+        @Override
+        public double releasePaidAmount(Long reportId) {
+        // Fetch the report from the database (assuming a Report entity exists)
+             Report report = paymentRepository.findById(reportId)
+                .orElseThrow(() ->  new EntityNotFoundException("Report not found for id: " + reportId)).getReport();
+
+        // Business logic to calculate the remaining amount
+            double totalAmount = report.getPrice();
+            double paidAmount = calculateTotalPaymentsByReport(reportId);
+
+
+            return totalAmount - paidAmount;
     }
-
 
 
 
@@ -169,5 +189,13 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
         paymentDTO.setCreatedAt(payments.getCreatedAt());
         return paymentDTO;
 
+
     }
+
+    public class ReportNotFoundException extends RuntimeException {
+        public ReportNotFoundException(String message) {
+            super(message);
+        }
+    }
+
 }

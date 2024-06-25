@@ -37,9 +37,15 @@ public class PurchasingDepartment {
     @Column(name = "payment")
     private Long payment;
 
+    @Column(name = "description")
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "profilePD_id")
     private ProfilePD profilePD;
+
+    @Transient
+    private Long fullAmount;
 
     @CreatedBy
     @Column(name = "created_by", nullable=false, updatable=false)
@@ -56,4 +62,8 @@ public class PurchasingDepartment {
     @LastModifiedBy
     @Column(name = "updated_by")
     private String updatedBy;
+
+    public Long getFullAmount() {
+        return this.number * this.price;
+    }
 }

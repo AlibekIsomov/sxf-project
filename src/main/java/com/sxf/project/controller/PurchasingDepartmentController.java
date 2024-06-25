@@ -70,6 +70,19 @@ public class PurchasingDepartmentController {
         }
     }
 
+
+    @GetMapping("/full-amount/{profilePDId}")
+    public ResponseEntity<Long> getTotalFullAmount(@PathVariable Long profilePDId) {
+        Long totalFullAmount = purchasingDepartmentService.getTotalFullAmountByProfilePD(profilePDId);
+        return ResponseEntity.ok(totalFullAmount);
+    }
+
+    @GetMapping("/remaining-payment/{profilePDId}")
+    public ResponseEntity<Long> getRemainingPayment(@PathVariable Long profilePDId) {
+        Long remainingPayment = purchasingDepartmentService.getRemainingPaymentByProfilePD(profilePDId);
+        return ResponseEntity.ok(remainingPayment);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
         purchasingDepartmentService.deleteById(id);
