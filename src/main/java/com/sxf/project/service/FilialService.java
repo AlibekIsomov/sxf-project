@@ -2,9 +2,11 @@ package com.sxf.project.service;
 
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.entity.Filial;
+import com.sxf.project.service.impl.FilialServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -32,4 +34,7 @@ public interface FilialService {
 
 
     FilialDTO assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException;
+
+    @Transactional
+    FilialDTO unassignFilialFromManager(Long managerId) throws FilialServiceImpl.AccessDeniedException;
 }

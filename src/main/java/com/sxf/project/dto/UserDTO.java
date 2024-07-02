@@ -28,6 +28,12 @@ public class UserDTO extends BaseDTO {
         this.email = user.getEmail();
         this.roles = user.getRoles();
         this.active = user.getActive();
+        if (user.getAssignedFilial() != null) {
+            this.assignedFilialId = user.getAssignedFilial().getId();
+        } else {
+            this.assignedFilialId = null;
+
+        }
     }
 
     public String getName() {

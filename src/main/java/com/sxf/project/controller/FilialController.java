@@ -34,18 +34,20 @@ public class FilialController {
     @Autowired
     FilialRepository filialRepository;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @GetMapping
     public ResponseEntity<Page<Filial>> getAll(Pageable pageable) throws Exception {
         return ResponseEntity.ok(filialService.getAll(pageable));
     }
 
+
     @Transactional
     @GetMapping("/{id}")
     public ResponseEntity<Filial> getById(@PathVariable Long id) throws Exception {
         return filialService.getById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Filial> create(@RequestBody FilialDTO data) throws Exception {
         try {
@@ -60,7 +62,7 @@ public class FilialController {
             return ResponseEntity.badRequest().build();
         }
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<Filial> update(@PathVariable Long id, @RequestBody FilialDTO data) {
         try {
@@ -77,7 +79,7 @@ public class FilialController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @GetMapping("/export")
     public ResponseEntity<InputStreamResource> exportExcel() throws IOException {
         ByteArrayInputStream in = filialService.exportExcel();
@@ -91,6 +93,7 @@ public class FilialController {
                 .body(new InputStreamResource(in));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
         filialService.deleteById(id);
@@ -106,6 +109,17 @@ public class FilialController {
             return ResponseEntity.notFound().build();
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(403).body(null);
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{managerId}/unassign")
+    public ResponseEntity<FilialDTO> unassignFilialFromManager(@PathVariable Long managerId) {
+        try {
+            FilialDTO filialDTO = filialService.unassignFilialFromManager(managerId);
+            return new ResponseEntity<>(filialDTO, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

@@ -2,9 +2,7 @@ package com.sxf.project.service.impl;
 
 
 import com.sxf.project.dto.ReportDTO;
-import com.sxf.project.entity.FileEntity;
-import com.sxf.project.entity.Filial;
-import com.sxf.project.entity.Report;
+import com.sxf.project.entity.*;
 import com.sxf.project.repository.FileRepository;
 import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.repository.ReportPaymentRepository;
@@ -15,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -42,22 +41,36 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Optional<Report> getById(Long id) throws Exception {
-        if (!reportRepository.existsById(id)) {
-            logger.info("Report with id " + id + " does not exists");
-            return Optional.empty();
+    public Optional<Report> getById(Long id, User currentUser) throws Exception {
+
+        Optional<Report> exsitingReport = reportRepository.findById(id);
+
+        if (exsitingReport.isPresent()) {
+            Report checkreport = exsitingReport.get();
+            if (!checkreport.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
         }
         return reportRepository.findById(id);
     }
 
 
     @Override
-    public Optional<Report> create(ReportDTO data) throws Exception {
+    public Optional<Report> create(ReportDTO data, User currentUser) throws Exception {
+
+        Optional<Report> optionalReport = reportRepository.findById(data.getId());
+        if (optionalReport.isPresent()) {
+            Report checkWorker = optionalReport.get();
+            if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId())) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
+        }
 
         Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
         if (!optionalFilial.isPresent()) {
             logger.info("Such ID filial does not exist!");
+            return Optional.empty();
         }
 
 
@@ -75,7 +88,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Optional<Report> update(Long id, ReportDTO data) throws Exception {
+    public Optional<Report> update(Long id, ReportDTO data, User currentUser) throws Exception {
         Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
         if (!optionalFilial.isPresent()) {
@@ -84,6 +97,14 @@ public class ReportServiceImpl implements ReportService {
         }
 
         Optional<Report> exsitingReport = reportRepository.findById(id);
+
+        if (exsitingReport.isPresent()) {
+            Report checkreport = exsitingReport.get();
+            if (!checkreport.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
+        }
+
 
         if (!exsitingReport.isPresent()) {
             logger.info("Report with id " + id + " does not exist");
@@ -128,9 +149,14 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void deleteById(Long id) {
-        if (!reportRepository.existsById(id)) {
-            logger.info("Reports with id " + id + " does not exists");
+    public void deleteById(Long id, User currentUser) {
+        Optional<Report> exsitingReport = reportRepository.findById(id);
+
+        if (exsitingReport.isPresent()) {
+            Report checkreport = exsitingReport.get();
+            if (!checkreport.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
         }
         reportRepository.deleteById(id);
     }

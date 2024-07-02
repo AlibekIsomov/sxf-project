@@ -3,10 +3,7 @@ package com.sxf.project.service.impl;
 import com.sxf.project.dto.MonthlySalaryDTO;
 import com.sxf.project.dto.WorkerDTO;
 import com.sxf.project.entity.*;
-import com.sxf.project.repository.FileRepository;
-import com.sxf.project.repository.MonthlySalaryPaymentRepository;
-import com.sxf.project.repository.MonthlySalaryRepository;
-import com.sxf.project.repository.WorkerRepository;
+import com.sxf.project.repository.*;
 import com.sxf.project.service.WorkerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,6 +24,9 @@ public class WorkerServiceImpl implements WorkerService {
 
     @Autowired
     WorkerRepository workerRepository;
+
+    @Autowired
+    FilialRepository filialRepository;
 
     @Autowired
     MonthlySalaryRepository monthlySalaryRepository;
@@ -45,36 +46,63 @@ public class WorkerServiceImpl implements WorkerService {
         return workerRepository.findAll();
     }
 
+
     @Override
-    public Optional<Worker> getById(Long id) throws Exception {
-        if(!workerRepository.existsById(id)) {
-            logger.info("Input with id " + id + " does not exists");
-            return Optional.empty();
+    public Optional<Worker> getById(Long id, User currentUser) throws Exception {
+
+        Optional<Worker> optionalWorker = workerRepository.findById(id);
+        if (optionalWorker.isPresent()) {
+            Worker checkWorker = optionalWorker.get();
+            if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
         }
         return workerRepository.findById(id);
     }
 
     @Override
-    public Optional<Worker> create(WorkerDTO data) throws Exception {
+    public Optional<Worker> create(WorkerDTO data, User currentUser) throws Exception {
+        Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialID());
 
+        // Check if the Filial exists
+        if (!optionalFilial.isPresent()) {
+            logger.info("Such ID filial does not exist!");
+            return Optional.empty(); // Or throw an appropriate exception
+        }
+
+        Optional<Worker> optionalWorker = workerRepository.findById(data.getId());
+        if (optionalWorker.isPresent()) {
+            Worker checkWorker = optionalWorker.get();
+            if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
+        }
+
+
+        // Create a new Worker
         Worker worker = new Worker();
         worker.setName(data.getName());
         worker.setSurname(data.getSurname());
         worker.setJobDescription(data.getJobDescription());
-        // Create an initial salary change
+        worker.setFilial(optionalFilial.get());
 
         return Optional.of(workerRepository.save(worker));
     }
 
     @Override
-    public Optional<Worker> update(Long id, WorkerDTO data) throws Exception {
+    public Optional<Worker> update(Long id, WorkerDTO data, User currentUser) throws Exception {
         Optional<Worker> optionalWorker = workerRepository.findById(id);
+
+        Worker checkWorker = optionalWorker.get();
+        if(!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId())) {
+            logger.info("Restricted for this manager");
+            return Optional.empty();
+        }
 
         if (optionalWorker.isPresent()) {
             Worker worker = optionalWorker.get();
 
             FileEntity oldFileEntity = worker.getFileEntity();
-            // Check if fileId is provided before removing the FileEntity
             if (data.getFileEntityId() != null) {
                 Optional<FileEntity> newFileEntityOptional = fileRepository.findById(data.getFileEntityId());
 
@@ -83,22 +111,14 @@ public class WorkerServiceImpl implements WorkerService {
                     return Optional.empty();
                 }
 
-                // Set the new FileEntity
                 FileEntity newFileEntity = newFileEntityOptional.get();
                 worker.setFileEntity(newFileEntity);
             } else {
-                // If fileId is not provided, remove the old FileEntity
                 if (oldFileEntity != null) {
-                    // Delete the old FileEntity from the repository
                     fileRepository.delete(oldFileEntity);
-                    // Remove the old FileEntity from the Store
                     worker.setFileEntity(null);
                 }
             }
-
-
-
-            // Update the worker's name and surname based on the data from WorkerDTO
             worker.setName(data.getName());
             worker.setSurname(data.getSurname());
             worker.setJobDescription(data.getJobDescription());
@@ -116,9 +136,15 @@ public class WorkerServiceImpl implements WorkerService {
     }
 
     @Override
-    public void deleteById(Long id) {
-        if(!workerRepository.existsById(id)) {
-            logger.info("Input with id " + id + " does not exists");
+    public void deleteById(Long id, User currentUser) {
+        Optional<Worker> optionalWorker = workerRepository.findById(id);
+
+
+        if (optionalWorker.isPresent()) {
+            Worker checkWorker = optionalWorker.get();
+            if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId())) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
         }
         List<MonthlySalaryPayment> paymentsToDelete = monthlySalaryPaymentRepository.findAllByMonthlySalaryId(id);
         monthlySalaryPaymentRepository.deleteAll(paymentsToDelete);

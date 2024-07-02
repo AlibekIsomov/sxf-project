@@ -1,5 +1,6 @@
 package com.sxf.project.service.impl;
 
+
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.FileEntity;
@@ -9,7 +10,6 @@ import com.sxf.project.entity.User;
 import com.sxf.project.repository.FileRepository;
 import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.repository.UserRepository;
-import com.sxf.project.response.ResourceNotFoundException;
 import com.sxf.project.service.FilialService;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -26,7 +26,6 @@ import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -195,6 +194,31 @@ public class FilialServiceImpl implements FilialService {
         filialRepository.save(filial); // Save the filial
 
         return convertToDTO(filial);
+    }
+
+    @Override
+    @Transactional
+    public FilialDTO unassignFilialFromManager(Long managerId) throws AccessDeniedException {
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (!manager.getRoles().contains(Role.MANAGER)) {
+            throw new AccessDeniedException("Access is denied");
+        }
+
+        Filial assignedFilial = manager.getAssignedFilial();
+        if (assignedFilial == null) {
+            throw new ResourceNotFoundException("Manager is not assigned to any filial");
+        }
+
+        // Unassign the manager from the filial
+        assignedFilial.getManagers().remove(manager);
+        manager.setAssignedFilial(null);
+
+        userRepository.save(manager); // Save the manager
+        filialRepository.save(assignedFilial); // Save the filial
+
+        return convertToDTO(assignedFilial);
     }
 
     private FilialDTO convertToDTO(Filial filial) {

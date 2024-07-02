@@ -19,12 +19,13 @@ public abstract class AbstractDTOController<ENTITY extends DistributedEntity, DT
     public ResponseEntity<?> getAll(Pageable pageable){
         return ResponseEntity.ok(service.getAll(pageable));
     }
+
     @PostMapping
     public ResponseEntity<?> create(@RequestBody ENTITY entity) throws Exception {
         return new ResponseEntity<>(service.create(entity), HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping()
     public ResponseEntity<?> update(@RequestBody ENTITY entity) throws Exception {
         return new ResponseEntity<>(service.update(entity), HttpStatus.CREATED);
     }

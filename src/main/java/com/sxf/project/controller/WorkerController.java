@@ -2,8 +2,10 @@ package com.sxf.project.controller;
 
 
 import com.sxf.project.dto.WorkerDTO;
+import com.sxf.project.entity.User;
 import com.sxf.project.entity.Worker;
 import com.sxf.project.repository.WorkerRepository;
+import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.WorkerService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,8 +28,8 @@ public class WorkerController{
     WorkerRepository workerRepository;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Worker> getById(@PathVariable Long id) throws Exception {
-        return workerService.getById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Worker> getById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
+        return workerService.getById(id,currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
@@ -37,9 +39,9 @@ public class WorkerController{
     }
 
     @PostMapping
-    public ResponseEntity<Worker> create(@RequestBody WorkerDTO data) {
+    public ResponseEntity<Worker> create(@RequestBody WorkerDTO data, @CurrentUser User user) throws Exception {
         try {
-            Optional<Worker> createdWorker = workerService.create(data);
+            Optional<Worker> createdWorker = workerService.create(data, user);
 
             if(createdWorker.isPresent()){
                 return ResponseEntity.ok(createdWorker.get());
@@ -54,9 +56,9 @@ public class WorkerController{
 
     @PutMapping("/{id}")
     public ResponseEntity<Worker> update(@PathVariable Long id,
-                                         @RequestBody WorkerDTO data) {
+                                         @RequestBody WorkerDTO data , @CurrentUser User currentUser) {
         try {
-            Optional<Worker> updatedWorker = workerService.update(id, data);
+            Optional<Worker> updatedWorker = workerService.update(id, data, currentUser);
 
             if (updatedWorker.isPresent()) {
                 return ResponseEntity.ok(updatedWorker.get());
@@ -74,8 +76,8 @@ public class WorkerController{
 
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        workerService.deleteById(id);
+    public void deleteById(@PathVariable Long id, @CurrentUser User currentUser) {
+        workerService.deleteById(id, currentUser);
     }
 
     @GetMapping("/search-name/{name}")

@@ -42,7 +42,7 @@ public class Worker {
     private List<MonthlySalary> monthlySalaries = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "filial_id")
+    @JoinColumn(name = "filial_id", nullable = false)
     private Filial filial;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

@@ -59,7 +59,6 @@ public class AccountController {
         UserDetails userDetails = userProvider.loadUserByUsername(userSpecial.getUsername());
         String token = jwtTokenUtil.generateToken(userDetails, true);
         return ResponseEntity.ok(new Token(token));
-
     }
     @PostMapping("/register")
     public ResponseEntity<UserDTO> register(@RequestBody User user) throws Exception {

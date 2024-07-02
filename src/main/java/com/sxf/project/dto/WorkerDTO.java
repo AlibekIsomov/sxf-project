@@ -20,4 +20,6 @@ public class WorkerDTO {
 
   private Long FileEntityId;
 
+  private Long filialID;
+
 }

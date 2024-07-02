@@ -3,7 +3,9 @@ package com.sxf.project.controller;
 
 import com.sxf.project.dto.ReportDTO;
 import com.sxf.project.entity.Report;
+import com.sxf.project.entity.User;
 import com.sxf.project.repository.ReportRepository;
+import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,14 +35,14 @@ public class ReportController {
 
     @Transactional
     @GetMapping("/{id}")
-    public ResponseEntity<Report> getById(@PathVariable Long id) throws Exception {
-        return reportService.getById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Report> getById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
+        return reportService.getById(id, currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Report> create(@RequestBody ReportDTO data) throws Exception {
+    public ResponseEntity<Report> create(@RequestBody ReportDTO data, @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<Report> createReport = reportService.create(data);
+            Optional<Report> createReport = reportService.create(data, currentUser);
 
             if (createReport.isPresent()) {
                 return ResponseEntity.ok(createReport.get());
@@ -53,9 +55,9 @@ public class ReportController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Report> update(@PathVariable Long id, @RequestBody ReportDTO data) {
+    public ResponseEntity<Report> update(@PathVariable Long id, @RequestBody ReportDTO data, @CurrentUser User currentUser) {
         try {
-            Optional<Report> updatedReport = reportService.update(id, data);
+            Optional<Report> updatedReport = reportService.update(id, data, currentUser);
 
             if (updatedReport.isPresent()) {
                 return ResponseEntity.ok(updatedReport.get());
@@ -70,7 +72,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        reportService.deleteById(id);
+    public void deleteById(@PathVariable Long id, @RequestBody ReportDTO data, @CurrentUser User currentUser) {
+        reportService.deleteById(id, currentUser);
     }
 }
