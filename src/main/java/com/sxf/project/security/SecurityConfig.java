@@ -146,7 +146,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedOrigin("https://185.198.152.35");
         config.addAllowedOrigin("http://185.198.152.35");
-        config.addAllowedOrigin("https://dashboard.qarshimall.uz");
+        config.addAllowedOrigin("https://sxf-cc.vercel.app");
         config.addAllowedOrigin("https://api.qarshimall.uz");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
