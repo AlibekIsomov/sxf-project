@@ -42,8 +42,9 @@ public class WorkerServiceImpl implements WorkerService {
         return workerRepository.findAll(pageable);
     }
 
-    public List<Worker> getAllWorker()  {
-        return workerRepository.findAll();
+    @Override
+    public Page<Worker> getAllByFilial(Long filialId, Pageable pageable) {
+        return workerRepository.findByFilialId(filialId, pageable);
     }
 
 
@@ -67,16 +68,15 @@ public class WorkerServiceImpl implements WorkerService {
         // Check if the Filial exists
         if (!optionalFilial.isPresent()) {
             logger.info("Such ID filial does not exist!");
-            return Optional.empty(); // Or throw an appropriate exception
-        }
 
-        Optional<Worker> optionalWorker = workerRepository.findById(data.getId());
-        if (optionalWorker.isPresent()) {
-            Worker checkWorker = optionalWorker.get();
-            if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            Filial checkFilial = optionalFilial.get();
+            if (!checkFilial.getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
                 throw new AccessDeniedException("Restricted for this manager");
             }
+            return Optional.empty();
+
         }
+
 
 
         // Create a new Worker

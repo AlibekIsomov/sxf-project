@@ -65,19 +65,18 @@ public class ProfilePDServiceImpl implements ProfilePDService {
     @Override
     public Optional<ProfilePD> create(ProfilePDDTO data, User currentUser) throws Exception {
 
-        Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getId());
-
-        if (optionalProfilePD.isPresent()) {
-            ProfilePD checkProfileDp = optionalProfilePD.get();
-            if (!checkProfileDp.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
-        }
 
         Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
         if (!optionalFilial.isPresent()) {
             logger.info("Such ID filial does not exist!");
+
+            Filial checkFilial = optionalFilial.get();
+            if (!checkFilial.getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
+            return Optional.empty();
+
         }
 
         ProfilePD profilePD = new ProfilePD();

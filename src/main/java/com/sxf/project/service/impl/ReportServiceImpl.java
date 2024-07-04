@@ -58,19 +58,17 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Optional<Report> create(ReportDTO data, User currentUser) throws Exception {
 
-        Optional<Report> optionalReport = reportRepository.findById(data.getId());
-        if (optionalReport.isPresent()) {
-            Report checkWorker = optionalReport.get();
-            if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId())) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
-        }
-
         Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
         if (!optionalFilial.isPresent()) {
             logger.info("Such ID filial does not exist!");
+
+            Filial checkFilial = optionalFilial.get();
+            if (!checkFilial.getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
             return Optional.empty();
+
         }
 
 

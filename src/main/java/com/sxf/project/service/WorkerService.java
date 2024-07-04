@@ -15,6 +15,8 @@ public interface WorkerService {
 
     Page<Worker> getAll(Pageable pageable) throws Exception;
 
+    Page<Worker> getAllByFilial(Long filialId, Pageable pageable);
+
     Optional<Worker> getById(Long id, User currentUser) throws Exception;
 
     Optional<Worker> create(WorkerDTO data, User currentUser) throws Exception;

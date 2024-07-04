@@ -38,10 +38,20 @@ public class WorkerController{
         return ResponseEntity.ok(workerService.getAll(pageable));
     }
 
+    @GetMapping("/byFilial")
+    public ResponseEntity<Page<Worker>> getAllByCurrentUserFilial(@CurrentUser User currentUser, Pageable pageable) throws Exception {
+        if (currentUser.getAssignedFilial() == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        Long filialId = currentUser.getAssignedFilial().getId();
+        Page<Worker> workers = workerService.getAllByFilial(filialId, pageable);
+        return ResponseEntity.ok(workers);
+    }
+
     @PostMapping
-    public ResponseEntity<Worker> create(@RequestBody WorkerDTO data, @CurrentUser User user) throws Exception {
+    public ResponseEntity<Worker> create(@RequestBody WorkerDTO data, @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<Worker> createdWorker = workerService.create(data, user);
+            Optional<Worker> createdWorker = workerService.create(data, currentUser);
 
             if(createdWorker.isPresent()){
                 return ResponseEntity.ok(createdWorker.get());
