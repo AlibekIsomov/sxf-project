@@ -28,6 +28,10 @@ public class JwtTokenUtil implements Serializable {
     public void setSecret(String secret) {
         this.secret = secret;
     }
+
+    @Value("${accessTokenKey}")
+    private String accessTokenKey;
+
     @Value("${refreshTokenKey}")
     private String refreshTokenKey;
 
@@ -93,7 +97,6 @@ public class JwtTokenUtil implements Serializable {
         return validateToken(token,refreshTokenKey);
     }
 
-
     private boolean validateToken(String token,String key){
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token);
@@ -126,4 +129,7 @@ public class JwtTokenUtil implements Serializable {
         log.info(Jwts.parser().setSigningKey(refreshTokenKey).parseClaimsJws(token).getBody().get("tokenId").toString());
         return UUID.fromString(Jwts.parser().setSigningKey(refreshTokenKey).parseClaimsJws(token).getBody().get("tokenId").toString());
     }
+
+
+
 }

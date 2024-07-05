@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -69,9 +70,10 @@ public class WorkerController{
     }
 
     @PostMapping
-    public ResponseEntity<Worker> create(@RequestBody WorkerDTO data, @CurrentUser User currentUser) throws Exception {
+    public ResponseEntity<Worker> create(@RequestBody WorkerDTO data, @AuthenticationPrincipal User currentUser) throws Exception {
         try {
             Optional<Worker> createdWorker = workerService.create(data, currentUser);
+
             if (createdWorker.isPresent()) {
                 return ResponseEntity.ok(createdWorker.get());
             } else {

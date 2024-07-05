@@ -51,17 +51,30 @@ public class WorkerServiceImpl implements WorkerService {
     public Optional<Worker> getById(Long id, User currentUser) throws Exception {
 
         Optional<Worker> optionalWorker = workerRepository.findById(id);
+
+        Worker checkWorker = optionalWorker.get();
+        Filial workerFilial = checkWorker.getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return Optional.empty();
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            return Optional.empty();
+        }
+        if(!workerRepository.existsById(id)) {
+            logger.info("Input with id " + id + " does not exists");
+        }
         if (!optionalWorker.isPresent()) {
-            Worker checkWorker = optionalWorker.get();
-            if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                logger.info("Restricted");
-                return Optional.empty();
-            }
             return Optional.empty();
         }
         return workerRepository.findById(id);
     }
-
 
 
     @Override
@@ -75,11 +88,20 @@ public class WorkerServiceImpl implements WorkerService {
 
         }
         Filial checkFilial = optionalFilial.get();
-        if (!currentUser.getAssignedFilial().getId().equals(checkFilial.getUser().getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-            logger.info("Restricted");
-            return Optional.empty();
-        }
 
+        Filial assignedFilial = currentUser.getAssignedFilial();
+        if (assignedFilial == null) {
+            if (!currentUser.getRoles().contains(Role.ADMIN)) {
+                logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+                return Optional.empty();
+            }
+        } else {
+            // If the current user has an assigned filial, check if it matches the checkFilial
+            if (!assignedFilial.getId().equals(checkFilial.getId())) {
+                logger.info("Restricted: User's assigned filial does not match the checkFilial");
+                return Optional.empty();
+            }
+        }
             // Create a new Worker
             Worker worker = new Worker();
             worker.setName(data.getName());
@@ -89,7 +111,8 @@ public class WorkerServiceImpl implements WorkerService {
 
             return Optional.of(workerRepository.save(worker));
 
-    }
+        }
+
 
 
 
@@ -98,8 +121,18 @@ public class WorkerServiceImpl implements WorkerService {
         Optional<Worker> optionalWorker = workerRepository.findById(id);
 
         Worker checkWorker = optionalWorker.get();
-        if(!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId())) {
-            logger.info("Restricted for this manager");
+        Filial workerFilial = checkWorker.getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return Optional.empty();
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
             return Optional.empty();
         }
 
@@ -143,14 +176,24 @@ public class WorkerServiceImpl implements WorkerService {
     public Optional<Object> deleteById(Long id, User currentUser) {
         Optional<Worker> optionalWorker = workerRepository.findById(id);
         Worker checkWorker = optionalWorker.get();
+        Filial workerFilial = checkWorker.getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
 
-        if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-            logger.info("Restricted");
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return Optional.empty();
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
             return Optional.empty();
         }
         if(!workerRepository.existsById(id)) {
             logger.info("Input with id " + id + " does not exists");
         }
+
         List<MonthlySalaryPayment> paymentsToDelete = monthlySalaryPaymentRepository.findAllByMonthlySalaryId(id);
         monthlySalaryPaymentRepository.deleteAll(paymentsToDelete);
         monthlySalaryRepository.deleteAll(monthlySalaryRepository.findAllByWorkerId(id));

@@ -24,4 +24,5 @@ public interface UserRepository extends DistributedRepository<User> {
     Optional<User> findByUsername(String username);;
 
     Optional<Object> findByEmail(String username);
+
 }

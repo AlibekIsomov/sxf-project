@@ -2,10 +2,7 @@ package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.ReportDTO;
 import com.sxf.project.dto.ReportPaymentDTO;
-import com.sxf.project.entity.Report;
-import com.sxf.project.entity.ReportPayment;
-import com.sxf.project.entity.Role;
-import com.sxf.project.entity.User;
+import com.sxf.project.entity.*;
 import com.sxf.project.repository.ReportPaymentRepository;
 import com.sxf.project.repository.ReportRepository;
 import com.sxf.project.service.ReportPaymentService;
@@ -13,7 +10,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -39,19 +35,24 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
     @Override
     public ResponseEntity<ReportPayment> addPayment(Long reportId, Long newPayment, User currentUser) {
         Optional<Report> reportOptional = reportRepository.findById(reportId);
+        Report report = reportOptional.get();
 
+        Filial Filialcheck = report.getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return ResponseEntity.status(403).body(null);
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            return ResponseEntity.status(403).body(null);
+        }
         if (reportOptional.isPresent()) {
-            Report report = reportOptional.get();
 
-            if (!report.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                    !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
-
-            // Check if the new payment is greater than or equal to the full amount
-            if (newPayment > report.getPrice() || calculateTotalPaymentsByReport(reportId) >= report.getPrice()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-            }
 
             ReportPayment payment = new ReportPayment();
             payment.setNewPayment(newPayment);
@@ -72,15 +73,24 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
 
     @Override
     public ResponseEntity<ReportPayment> updatePayment(Long reportId, Long reportPaymentId, Long newPayment, User currentUser) {
-        Optional<Report> reportOptional = reportRepository.findById(reportPaymentId);
+        Optional<Report> reportOptional = reportRepository.findById(reportId);
+        Filial Filialcheck = reportOptional.get().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return ResponseEntity.status(403).body(null);
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            return ResponseEntity.status(403).body(null);
+        }
 
         if (reportOptional.isPresent()) {
             Report report = reportOptional.get();
-
-            if (!report.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                    !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
             // Find the existing payment by ID
             Optional<ReportPayment> paymentOptional = report.getPayments().stream()
                     .filter(payment -> payment.getId().equals(reportPaymentId))
@@ -145,10 +155,19 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
             // Remove the payment from the associated store's payments list
             Report report = paymentToDelete.getReport();
 
-            if (!report.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                    !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
+            Filial Filialcheck = report.getFilial();
+            Filial currentUserFilial = currentUser.getAssignedFilial();
+
+            // Check if the current user is not assigned to a filial and is not an admin
+            if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+                logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
             }
+
+            // If the current user has an assigned filial, check if it matches the worker's filial
+            if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            }
+
             if (report != null) {
                 report.getPayments().remove(paymentToDelete);
             }

@@ -52,12 +52,24 @@ public class ProfilePDServiceImpl implements ProfilePDService {
     public Optional<ProfilePD> getById(Long id, User currentUser) throws Exception {
 
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
+        Filial workerFilial = optionalProfilePD.get().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return Optional.empty();
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            return Optional.empty();
+        }
 
         if (optionalProfilePD.isPresent()) {
             ProfilePD checkProfileDp = optionalProfilePD.get();
-            if (!checkProfileDp.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
+        return Optional.empty();
         }
         return profilePDRepository.findById(id);
     }
@@ -72,8 +84,19 @@ public class ProfilePDServiceImpl implements ProfilePDService {
             logger.info("Such ID filial does not exist!");
 
             Filial checkFilial = optionalFilial.get();
-            if (!checkFilial.getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
+
+            Filial assignedFilial = currentUser.getAssignedFilial();
+            if (assignedFilial == null) {
+                if (!currentUser.getRoles().contains(Role.ADMIN)) {
+                    logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+                    return Optional.empty();
+                }
+            } else {
+                // If the current user has an assigned filial, check if it matches the checkFilial
+                if (!assignedFilial.getId().equals(checkFilial.getId())) {
+                    logger.info("Restricted: User's assigned filial does not match the checkFilial");
+                    return Optional.empty();
+                }
             }
             return Optional.empty();
 
@@ -94,9 +117,11 @@ public class ProfilePDServiceImpl implements ProfilePDService {
 
         ProfilePD checkProfileDp = optionalProfilePD.get();
 
+        Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
         if (optionalProfilePD.isPresent()) {
             ProfilePD profilePDUpdate = optionalProfilePD.get();
+
 
             FileEntity oldFileEntity = profilePDUpdate.getFileEntity();
             // Check if fileId is provided before removing the FileEntity
@@ -107,10 +132,19 @@ public class ProfilePDServiceImpl implements ProfilePDService {
                     logger.info("FileEntity with id " + data.getFileEntityId() + " does not exist");
                     return Optional.empty();
                 }
-
-                if(!checkProfileDp.getFilial().getId().equals(currentUser.getAssignedFilial().getId())) {
-                    logger.info("Restricted for this manager");
-                    return Optional.empty();
+                Filial checkFilial = optionalFilial.get();
+                Filial assignedFilial = currentUser.getAssignedFilial();
+                if (assignedFilial == null) {
+                    if (!currentUser.getRoles().contains(Role.ADMIN)) {
+                        logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+                        return Optional.empty();
+                    }
+                } else {
+                    // If the current user has an assigned filial, check if it matches the checkFilial
+                    if (!assignedFilial.getId().equals(checkFilial.getId())) {
+                        logger.info("Restricted: User's assigned filial does not match the checkFilial");
+                        return Optional.empty();
+                    }
                 }
                 // Set the new FileEntity
                 FileEntity newFileEntity = newFileEntityOptional.get();
@@ -128,7 +162,7 @@ public class ProfilePDServiceImpl implements ProfilePDService {
             profilePDUpdate.setDescription(data.getDescription());
 
 
-            // profilePDUpdate.setFilial(optionalFilial.get());
+             profilePDUpdate.setFilial(optionalFilial.get());
 
             return Optional.of(profilePDRepository.save(profilePDUpdate));
         } else {
@@ -143,12 +177,21 @@ public class ProfilePDServiceImpl implements ProfilePDService {
     @Override
     public void deleteById(Long id, User currentUser) {
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
+        Filial workerFilial = optionalProfilePD.get().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+        }
 
         if (optionalProfilePD.isPresent()) {
             ProfilePD checkProfileDp = optionalProfilePD.get();
-            if (!checkProfileDp.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
         };
         profilePDRepository.deleteById(id);
     }

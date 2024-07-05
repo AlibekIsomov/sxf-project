@@ -1,10 +1,7 @@
 package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.MonthlySalaryPaymentDTO;
-import com.sxf.project.entity.MonthlySalary;
-import com.sxf.project.entity.MonthlySalaryPayment;
-import com.sxf.project.entity.Role;
-import com.sxf.project.entity.User;
+import com.sxf.project.entity.*;
 import com.sxf.project.repository.MonthlySalaryPaymentRepository;
 import com.sxf.project.repository.MonthlySalaryRepository;
 import com.sxf.project.service.MonthlySalaryPaymentService;
@@ -36,9 +33,17 @@ public class MonthlySalaryPaymentServiceImpl implements MonthlySalaryPaymentServ
         Optional<MonthlySalary> monthlySalaryOptional = monthlySalaryRepository.findById(data.getMonthlySalaryId());
         MonthlySalary checkFilial = monthlySalaryOptional.get();
 
-        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+        Filial workerFilial = checkFilial.getWorker().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
         if (!monthlySalaryOptional.isPresent()) {
@@ -65,10 +70,19 @@ public class MonthlySalaryPaymentServiceImpl implements MonthlySalaryPaymentServ
 
         Optional<MonthlySalary> monthlySalaryOptional = monthlySalaryRepository.findById(data.getMonthlySalaryId());
         MonthlySalary checkFilial = monthlySalaryOptional.get();
-        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+        Filial workerFilial = checkFilial.getWorker().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
         }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+        }
+
         if (!monthlySalaryOptional.isPresent()) {
             logger.info("Such ID monthlySalary does not exist!");
         }
@@ -87,10 +101,20 @@ public class MonthlySalaryPaymentServiceImpl implements MonthlySalaryPaymentServ
     public void deletePayment(Long monthlySalaryPaymentsId, User currentUser) {
         Optional<MonthlySalaryPayment> paymentOptional = monthlySalaryPaymentRepository.findById(monthlySalaryPaymentsId);
         MonthlySalaryPayment checkFilial = paymentOptional.get();
-        if (!checkFilial.getMonthlySalary().getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+
+        Filial Filialcheck = checkFilial.getMonthlySalary().getWorker().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
         }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+        }
+
         if (paymentOptional.isPresent()) {
             MonthlySalaryPayment paymentToDelete = paymentOptional.get();
 
@@ -109,10 +133,19 @@ public class MonthlySalaryPaymentServiceImpl implements MonthlySalaryPaymentServ
         Optional<MonthlySalary> monthlySalaryOptional = monthlySalaryRepository.findById(monthlySalaryId);
         MonthlySalary checkFilial = monthlySalaryOptional.get();
 
-        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+        Filial Filialcheck = checkFilial.getWorker().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
         }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+        }
+
         return monthlySalaryPaymentRepository.findByMonthlySalaryId(monthlySalary.getId());
     }
 }

@@ -63,6 +63,7 @@ public class FilialController {
             return ResponseEntity.badRequest().build();
         }
     }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<Filial> update(@PathVariable Long id, @RequestBody FilialDTO data) {

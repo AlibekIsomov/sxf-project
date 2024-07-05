@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -43,9 +44,15 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         }
 
         ProfilePD checkFilial = optionalProfilePD.get();
-        if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUser == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUser != null && !currentUser.getId().equals(checkFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
         if(!purchasingDepartmentRepository.existsById(id)) {
@@ -62,11 +69,20 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
 
         if (!optionalProfilePD.isPresent()) {
             logger.info("Such ID filial does not exist!");
+            return Optional.empty();
+        }
 
-            ProfilePD checkFilial = optionalProfilePD.get();
-            if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
+        Filial Filialcheck = optionalProfilePD.get().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
         PurchasingDepartment purchasingDepartment = new PurchasingDepartment();
@@ -88,10 +104,21 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         if (!optionalProfilePD.isPresent()) {
             logger.info("Such ID filial does not exist!");
 
-            ProfilePD checkFilial = optionalProfilePD.get();
-            if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
+           return Optional.empty();
+
+        }
+
+        Filial Filialcheck = optionalProfilePD.get().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
         if (optionalPurchasingDepartmentUpdate.isPresent()) {
@@ -133,14 +160,20 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
             logger.info("ProfilePD with id " + id + " does not exists");
 
             Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
+            Filial Filialcheck = optionalProfilePD.get().getFilial();
+            Filial currentUserFilial = currentUser.getAssignedFilial();
 
+            // Check if the current user is not assigned to a filial and is not an admin
+            if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+                logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            }
+
+            // If the current user has an assigned filial, check if it matches the worker's filial
+            if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            }
             if (!optionalProfilePD.isPresent()) {
                 logger.info("Such ID filial does not exist!");
-
-                ProfilePD checkFilial = optionalProfilePD.get();
-                if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                    throw new AccessDeniedException("Restricted for this manager");
-                }
             }
         };
         purchasingDepartmentRepository.deleteById(id);

@@ -2,15 +2,17 @@ package com.sxf.project.security;
 
 
 import com.sxf.project.entity.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class UserSpecial implements UserDetails {
+public class UserSpecial implements UserDetails, Serializable {
 
     private String username;
     private String password;

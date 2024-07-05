@@ -39,18 +39,29 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
         Optional<Worker> workerOptional = workerRepository.findById(data.getWorkerId());
 
         Worker worker = workerOptional.get();
+        Filial Filialcheck = workerOptional.get().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
 
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return Optional.empty();
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            return Optional.empty();
+        }
             if (workerOptional.isPresent()) {
-                if (!worker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                    !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
+                 return Optional.empty();
             }
-            worker.setCurrentSalary(data.getPaymentAmount());
-            workerRepository.save(worker);
-        } else {
+            else {
                 logger.info("Such ID worker does not exist!");
             }
 
+            worker.setCurrentSalary(data.getPaymentAmount());
+            workerRepository.save(worker);
             MonthlySalary monthlySalary = new MonthlySalary();
 
             monthlySalary.setMonthDate(data.getMonthDate());
@@ -76,9 +87,19 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
 
         Worker checkFilial = workerOptional.get();
 
-        if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+        Filial Filialcheck = workerOptional.get().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return Optional.empty();
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            return Optional.empty();
         }
 
         if (workerOptional.isPresent()) {
@@ -107,9 +128,17 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
         Optional<MonthlySalary> optionalMonthlySalary = monthlySalaryRepository.findById(id);
         MonthlySalary checkFilial = optionalMonthlySalary.get();
 
-        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+        Filial workerFilial = checkFilial.getWorker().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
         if(!optionalMonthlySalary.isPresent()) {
@@ -133,9 +162,17 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
 
         MonthlySalary checkFilial = optionalMonthlySalary.get();
 
-        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+        Filial workerFilial = checkFilial.getWorker().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
         Worker worker = workerRepository.findById(workerId)
@@ -151,9 +188,17 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
 
         MonthlySalary checkFilial = optionalMonthlySalary.get();
 
-        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                !currentUser.getRoles().contains(Role.ADMIN)) {
-            throw new AccessDeniedException("Restricted for this manager");
+        Filial workerFilial = checkFilial.getWorker().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
         if (!monthlySalaryRepository.existsById(id)) {
