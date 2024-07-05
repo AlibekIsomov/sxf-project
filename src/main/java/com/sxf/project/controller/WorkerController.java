@@ -7,6 +7,9 @@ import com.sxf.project.entity.Worker;
 import com.sxf.project.repository.WorkerRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.WorkerService;
+import com.sxf.project.service.impl.WorkerServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -14,9 +17,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Optional;
+
+
 
 @RestController
 @RequestMapping("/api/worker")
@@ -27,9 +34,22 @@ public class WorkerController{
     @Autowired
     WorkerRepository workerRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(WorkerController.class);
+
     @GetMapping("/{id}")
-    public ResponseEntity<Worker> getById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
-        return workerService.getById(id,currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Worker> getById(@PathVariable Long id, @CurrentUser User currentUser) {
+        try {
+            Optional<Worker> worker = workerService.getById(id, currentUser);
+            return worker.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (RuntimeException ex) {
+            // Log the exception for debugging purposes
+            logger.error("Internal Server Error while processing request", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -52,17 +72,16 @@ public class WorkerController{
     public ResponseEntity<Worker> create(@RequestBody WorkerDTO data, @CurrentUser User currentUser) throws Exception {
         try {
             Optional<Worker> createdWorker = workerService.create(data, currentUser);
-
-            if(createdWorker.isPresent()){
+            if (createdWorker.isPresent()) {
                 return ResponseEntity.ok(createdWorker.get());
-            }
-            else {
+            } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Worker> update(@PathVariable Long id,

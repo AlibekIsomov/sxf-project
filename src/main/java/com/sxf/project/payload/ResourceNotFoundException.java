@@ -1,4 +1,4 @@
-package com.sxf.project.response;
+package com.sxf.project.payload;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +31,11 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
     @Autowired
     PasswordEncoder encoder;
 
+
     public UserServiceImpl(DistributedRepository<User> repository, AbstractDTOConverter<User, UserDTO> converter) {
         super(repository, converter);
     }
+
 
     private String getPrincipal() {
         String userName = null;

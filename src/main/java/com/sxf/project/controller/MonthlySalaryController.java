@@ -4,7 +4,9 @@ package com.sxf.project.controller;
 
 import com.sxf.project.dto.MonthlySalaryDTO;
 import com.sxf.project.entity.MonthlySalary;
+import com.sxf.project.entity.User;
 import com.sxf.project.repository.MonthlySalaryRepository;
+import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.MonthlySalaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,14 +35,16 @@ public class MonthlySalaryController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<MonthlySalary> getById(@PathVariable Long id) throws Exception {
-        return monthlySalaryService.getById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<MonthlySalary> getById(@PathVariable Long id,
+                                                 @CurrentUser User currentUser) throws Exception {
+        return monthlySalaryService.getById(id, currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<MonthlySalary> create(@RequestBody MonthlySalaryDTO data) throws Exception {
+    public ResponseEntity<MonthlySalary> create(@RequestBody MonthlySalaryDTO data,
+                                                @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<MonthlySalary> createdMonthlySalary = monthlySalaryService.create(data);
+            Optional<MonthlySalary> createdMonthlySalary = monthlySalaryService.create(data,currentUser);
 
             if (createdMonthlySalary.isPresent()) {
                 return ResponseEntity.ok(createdMonthlySalary.get());
@@ -53,9 +57,11 @@ public class MonthlySalaryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MonthlySalary> update(@PathVariable Long id, @RequestBody MonthlySalaryDTO data) {
+    public ResponseEntity<MonthlySalary> update(@PathVariable Long id,
+                                                @RequestBody MonthlySalaryDTO data,
+                                                @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<MonthlySalary> updatedMonthlySalary = monthlySalaryService.update(id, data);
+            Optional<MonthlySalary> updatedMonthlySalary = monthlySalaryService.update(id, data, currentUser);
 
             if (updatedMonthlySalary.isPresent()) {
                 return ResponseEntity.ok(updatedMonthlySalary.get());
@@ -70,13 +76,15 @@ public class MonthlySalaryController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        monthlySalaryService.deleteById(id);
+    public void deleteById(@PathVariable Long id,
+                           @CurrentUser User currentUser) throws Exception {
+        monthlySalaryService.deleteById(id, currentUser);
     }
 
 
     @GetMapping("/worker/{workerId}")
-    public List<MonthlySalary> getMonthlySalariesByWorkerId(@PathVariable Long workerId) {
-        return monthlySalaryService.getMonthlySalariesByWorkerId(workerId);
+    public List<MonthlySalary> getMonthlySalariesByWorkerId(@PathVariable Long workerId,
+                                                            @CurrentUser User currentUser) throws Exception {
+        return monthlySalaryService.getMonthlySalariesByWorkerId(workerId, currentUser);
     }
 }

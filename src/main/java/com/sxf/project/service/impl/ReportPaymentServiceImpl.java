@@ -4,18 +4,20 @@ import com.sxf.project.dto.ReportDTO;
 import com.sxf.project.dto.ReportPaymentDTO;
 import com.sxf.project.entity.Report;
 import com.sxf.project.entity.ReportPayment;
+import com.sxf.project.entity.Role;
+import com.sxf.project.entity.User;
 import com.sxf.project.repository.ReportPaymentRepository;
 import com.sxf.project.repository.ReportRepository;
 import com.sxf.project.service.ReportPaymentService;
-import javassist.NotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,11 +37,16 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
 
 
     @Override
-    public ResponseEntity<ReportPayment> addPayment(Long reportId, Long newPayment) {
+    public ResponseEntity<ReportPayment> addPayment(Long reportId, Long newPayment, User currentUser) {
         Optional<Report> reportOptional = reportRepository.findById(reportId);
 
         if (reportOptional.isPresent()) {
             Report report = reportOptional.get();
+
+            if (!report.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                    !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
 
             // Check if the new payment is greater than or equal to the full amount
             if (newPayment > report.getPrice() || calculateTotalPaymentsByReport(reportId) >= report.getPrice()) {
@@ -64,12 +71,16 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
 
 
     @Override
-    public ResponseEntity<ReportPayment> updatePayment(Long reportId, Long reportPaymentId, Long newPayment) {
+    public ResponseEntity<ReportPayment> updatePayment(Long reportId, Long reportPaymentId, Long newPayment, User currentUser) {
         Optional<Report> reportOptional = reportRepository.findById(reportPaymentId);
 
         if (reportOptional.isPresent()) {
             Report report = reportOptional.get();
 
+            if (!report.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                    !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
             // Find the existing payment by ID
             Optional<ReportPayment> paymentOptional = report.getPayments().stream()
                     .filter(payment -> payment.getId().equals(reportPaymentId))
@@ -125,7 +136,7 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
 
 
     @Override
-    public void deletePayment(Long paymentId) {
+    public void deletePayment(Long paymentId, User currentUser) {
         Optional<ReportPayment> paymentOptional = paymentRepository.findById(paymentId);
 
         if (paymentOptional.isPresent()) {
@@ -133,6 +144,11 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
 
             // Remove the payment from the associated store's payments list
             Report report = paymentToDelete.getReport();
+
+            if (!report.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                    !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
             if (report != null) {
                 report.getPayments().remove(paymentToDelete);
             }
@@ -148,13 +164,17 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
     }
 
     @Override
-    public ResponseEntity<List<ReportPaymentDTO>> getAllPayments(Long reportId){
+    public ResponseEntity<List<ReportPaymentDTO>> getAllPayments(Long reportId, User currentUser){
 
         Optional<Report> reportOptional = reportRepository.findById(reportId);
 
         if (reportOptional.isPresent()) {
             Report report = reportOptional.get();
 
+            if (!report.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                    !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
             List<ReportPaymentDTO> paymentDTOs = report.getPayments()
                     .stream()
                     .map(this::convertToPaymentDTO)

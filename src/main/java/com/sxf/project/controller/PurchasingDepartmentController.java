@@ -3,8 +3,11 @@ package com.sxf.project.controller;
 
 import com.sxf.project.dto.PurchasingDepartmentDTO;
 import com.sxf.project.entity.PurchasingDepartment;
+import com.sxf.project.entity.User;
 import com.sxf.project.repository.PurchasingDepartmentRepository;
+import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.PurchasingDepartmentService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
+
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -34,14 +37,14 @@ public class PurchasingDepartmentController {
 
     @Transactional
     @GetMapping("/{id}")
-    public ResponseEntity<PurchasingDepartment> getById(@PathVariable Long id) throws Exception {
-        return purchasingDepartmentService.getById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<PurchasingDepartment> getById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
+        return purchasingDepartmentService.getById(id,currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<PurchasingDepartment> create(@RequestBody PurchasingDepartmentDTO data) throws Exception {
+    public ResponseEntity<PurchasingDepartment> create(@RequestBody PurchasingDepartmentDTO data, @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<PurchasingDepartment> purchasingDepartmentCreate = purchasingDepartmentService.create(data);
+            Optional<PurchasingDepartment> purchasingDepartmentCreate = purchasingDepartmentService.create(data,currentUser);
 
             if (purchasingDepartmentCreate.isPresent()) {
                 return ResponseEntity.ok(purchasingDepartmentCreate.get());
@@ -54,9 +57,11 @@ public class PurchasingDepartmentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PurchasingDepartment> update(@PathVariable Long id, @RequestBody PurchasingDepartmentDTO data) {
+    public ResponseEntity<PurchasingDepartment> update(@PathVariable Long id,
+                                                       @RequestBody PurchasingDepartmentDTO data,
+                                                       @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<PurchasingDepartment> updatedStore = purchasingDepartmentService.update(id, data);
+            Optional<PurchasingDepartment> updatedStore = purchasingDepartmentService.update(id, data, currentUser);
 
             if (updatedStore.isPresent()) {
                 return ResponseEntity.ok(updatedStore.get());
@@ -84,8 +89,9 @@ public class PurchasingDepartmentController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        purchasingDepartmentService.deleteById(id);
+    public void deleteById(@PathVariable Long id,
+                           @CurrentUser User currentUser) throws Exception {
+        purchasingDepartmentService.deleteById(id, currentUser);
     }
 
 }

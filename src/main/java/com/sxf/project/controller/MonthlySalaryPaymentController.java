@@ -2,7 +2,9 @@ package com.sxf.project.controller;
 
 import com.sxf.project.dto.MonthlySalaryPaymentDTO;
 import com.sxf.project.entity.MonthlySalaryPayment;
+import com.sxf.project.entity.User;
 import com.sxf.project.repository.MonthlySalaryPaymentRepository;
+import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.MonthlySalaryPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,9 +25,9 @@ public class  MonthlySalaryPaymentController {
     MonthlySalaryPaymentRepository monthlySalaryPaymentRepository;
 
     @PostMapping
-    public ResponseEntity<MonthlySalaryPayment> create(@RequestBody MonthlySalaryPaymentDTO data) throws Exception {
+    public ResponseEntity<MonthlySalaryPayment> create(@RequestBody MonthlySalaryPaymentDTO data, @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<MonthlySalaryPayment> createdMonthlySalary = monthlySalaryPaymentService.create(data);
+            Optional<MonthlySalaryPayment> createdMonthlySalary = monthlySalaryPaymentService.create(data, currentUser);
 
             if (createdMonthlySalary.isPresent()) {
                 return ResponseEntity.ok(createdMonthlySalary.get());
@@ -38,9 +40,9 @@ public class  MonthlySalaryPaymentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MonthlySalaryPayment> update(@PathVariable Long id, @RequestBody MonthlySalaryPaymentDTO data) {
+    public ResponseEntity<MonthlySalaryPayment> update(@PathVariable Long id, @RequestBody MonthlySalaryPaymentDTO data, @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<MonthlySalaryPayment> updatedMonthlySalary = monthlySalaryPaymentService.update(id, data);
+            Optional<MonthlySalaryPayment> updatedMonthlySalary = monthlySalaryPaymentService.update(id, data, currentUser);
 
             if (updatedMonthlySalary.isPresent()) {
                 return ResponseEntity.ok(updatedMonthlySalary.get());
@@ -55,11 +57,11 @@ public class  MonthlySalaryPaymentController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        monthlySalaryPaymentService.deletePayment(id);
+    public void deleteById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
+        monthlySalaryPaymentService.deletePayment(id, currentUser);
     }
     @GetMapping("/get/{monthlySalaryId}")
-    public List<MonthlySalaryPayment> getMonthlySalariesByMonthlySalaryId(@PathVariable Long monthlySalaryId) {
-        return monthlySalaryPaymentService.getMonthlySalariesByMonthlySalaryId(monthlySalaryId);
+    public List<MonthlySalaryPayment> getMonthlySalariesByMonthlySalaryId(@PathVariable Long monthlySalaryId, @CurrentUser User currentUser) throws Exception {
+        return monthlySalaryPaymentService.getMonthlySalariesByMonthlySalaryId(monthlySalaryId, currentUser);
     }
 }

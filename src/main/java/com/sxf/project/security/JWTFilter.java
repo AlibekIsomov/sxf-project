@@ -1,23 +1,16 @@
 package com.sxf.project.security;
 
-
-
-import io.jsonwebtoken.ExpiredJwtException;
-
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
@@ -26,45 +19,31 @@ public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    private UserProvider authService;
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
-        try {
-
-            String jwtToken = extractJwtFromRequest(request);
-
-            if (StringUtils.hasText(jwtToken) && jwtTokenUtil.validateToken(jwtToken)) {
-                UserDetails userDetails = new User(jwtTokenUtil.getUsernameFromToken(jwtToken), "",
-                        jwtTokenUtil.getRolesFromToken(jwtToken));
-
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                // After setting the Authentication in the context, we specify
-                // that the current user is authenticated. So it passes the
-                // Spring Security Configurations successfully.
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
 
+        String token = request.getHeader("Authorization");
+        if(token!=null && token.startsWith("Bearer") && !request.getRequestURI().startsWith("/api/auth/")){
+            token=token.substring(7);
+            boolean validateToken = jwtTokenUtil.validateAccessToken(token);
+            if(validateToken){
+                String username = jwtTokenUtil.getUsernameFromAccessToken(token);
+                UserDetails userDetails = authService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
             }
-        } catch (ExpiredJwtException ex) {
-            request.setAttribute("exception", ex);
-            throw ex;
-        } catch (BadCredentialsException ex) {
-            request.setAttribute("exception", ex);
-            throw ex;
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
         }
-        chain.doFilter(request, response);
+
+        filterChain.doFilter(request,response);
     }
-
-    private String extractJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7, bearerToken.length());
-        }
-        return null;
-    }
-
-
 }

@@ -1,6 +1,7 @@
 package com.sxf.project.security;
 
 import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,16 +14,22 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class JwtTokenUtil implements Serializable {
 
     private String secret;
-    private int jwtExpirationInMs;
-    private int jwtExpirationInMsRememberMe;
+    private long jwtExpirationInMs;
+    private long jwtExpirationInMsRememberMe;
+
+    @Value("${jwt.jwtExpirationInMs}")
+    private long refreshTokenExpirationMs;
 
     @Value("${jwt.secret}")
     public void setSecret(String secret) {
         this.secret = secret;
     }
+    @Value("${refreshTokenKey}")
+    private String refreshTokenKey;
 
     @Value("${jwt.jwtExpirationInMs}")
     public void setJwtExpirationInMs(String jwtExpirationInMs) {
@@ -33,16 +40,16 @@ public class JwtTokenUtil implements Serializable {
     public void setJwtExpirationInMsRememberMe(String jwtExpirationInMsRememberME) {
         this.jwtExpirationInMsRememberMe = Integer.parseInt(jwtExpirationInMsRememberME);
     }
-
-    // generate token for user
     public String generateToken(UserDetails userDetails, boolean rememberMe) {
         Map<String, Object> claims = new HashMap<>();
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
 
 
-        claims.put("roles", roles.stream()
-                .map(role -> role.getAuthority().substring(role.getAuthority().indexOf("_") + 1))
-                .toArray(String[]::new));
+// TODO ROLE bilan boshlanishni hal qilish zarur bu vaqtinchalik
+        claims.put("roles", roles.stream().map(e -> {
+            String r = e.getAuthority().toString();
+            return r.substring(r.indexOf("_")+1);
+        }).toArray());
 
 
         return doGenerateToken(claims, userDetails.getUsername(), rememberMe);
@@ -52,39 +59,71 @@ public class JwtTokenUtil implements Serializable {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + (rememberMe ? jwtExpirationInMsRememberMe : jwtExpirationInMs))).signWith(SignatureAlgorithm.HS512, secret).compact();
     }
+    // generate token for user
 
-    public boolean validateToken(String authToken) {
+    public String generateAccessToken(String username){
+        Date expireDate = new Date(System.currentTimeMillis() + secret);
+
+        return Jwts
+                .builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+    }
+
+    public String generateRefreshToken(String username, UUID refreshTokenId){
+        Date expireDate = new Date(System.currentTimeMillis() + refreshTokenExpirationMs);
+        return Jwts
+                .builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, refreshTokenKey)
+                .claim("tokenId",refreshTokenId.toString())
+                .compact();
+    }
+
+    public boolean validateAccessToken(String token){
+        return validateToken(token,secret);
+    }
+
+    public boolean validateRefreshToken(String token){
+        return validateToken(token,refreshTokenKey);
+    }
+
+
+    private boolean validateToken(String token,String key){
         try {
-
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken);
-
+            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             return true;
-        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
-            System.out.println("Noto'g'ri");
-            throw new BadCredentialsException("INVALID_CREDENTIALS", ex);
+        } catch (SignatureException ex) {
+            log.error("Invalid JWT signature");
+        } catch (MalformedJwtException ex) {
+            log.error("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
-//            throw new ExpiredJwtException(header, claims, "Token has Expired", ex);
-            System.out.println("Muddat eskirgan");
-            return false;
+            log.error("Expired JWT token");
+        } catch (UnsupportedJwtException ex) {
+            log.error("Unsupported JWT token");
+        } catch (IllegalArgumentException ex) {
+            log.error("JWT claims string is empty.");
         }
+        return false;
     }
 
-    public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-
-        return claims.getSubject();
+    public String getUsernameFromAccessToken(String token){
+        return Jwts
+                .parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public List<SimpleGrantedAuthority> getRolesFromToken(String authToken) {
+    public String getUsernameFromRefreshToken(String token){
+        return Jwts
+                .parser().setSigningKey(refreshTokenKey).parseClaimsJws(token).getBody().getSubject();
+    }
 
-        List<SimpleGrantedAuthority> roles = null;
-
-        Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken).getBody();
-
-        roles = ((List<String>) claims.get("roles", List.class))
-                .stream().map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
-        return roles;
+    public UUID getRefreshTokenIdFromRefreshToken(String token){
+        log.info(Jwts.parser().setSigningKey(refreshTokenKey).parseClaimsJws(token).getBody().get("tokenId").toString());
+        return UUID.fromString(Jwts.parser().setSigningKey(refreshTokenKey).parseClaimsJws(token).getBody().get("tokenId").toString());
     }
 }

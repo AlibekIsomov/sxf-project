@@ -5,10 +5,10 @@ import com.sxf.project.dto.WorkerDTO;
 import com.sxf.project.entity.MonthlySalary;
 import com.sxf.project.entity.User;
 import com.sxf.project.entity.Worker;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 public interface WorkerService {
@@ -26,7 +26,7 @@ public interface WorkerService {
 
     Page<Worker> getAllByNameAndSurnameContains(String name, String surname, Pageable pageable);
 
-    void deleteById(Long id, User currentUser);
+    Optional<Object> deleteById(Long id, User currentUser);
 
     @Transactional
     Optional<MonthlySalary> createForSchedule(MonthlySalaryDTO data) throws Exception;

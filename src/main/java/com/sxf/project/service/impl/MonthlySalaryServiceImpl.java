@@ -1,22 +1,21 @@
 package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.MonthlySalaryDTO;
-import com.sxf.project.entity.MonthlySalary;
-import com.sxf.project.entity.MonthlySalaryPayment;
-import com.sxf.project.entity.PaymentStatus;
-import com.sxf.project.entity.Worker;
+import com.sxf.project.entity.*;
 import com.sxf.project.repository.MonthlySalaryPaymentRepository;
 import com.sxf.project.repository.MonthlySalaryRepository;
 import com.sxf.project.repository.WorkerRepository;
+import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.MonthlySalaryService;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,12 +34,17 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
 
 
     @Override
-    public Optional<MonthlySalary> create(MonthlySalaryDTO data) throws Exception {
+    public Optional<MonthlySalary> create(MonthlySalaryDTO data, @CurrentUser User currentUser) throws Exception {
 
         Optional<Worker> workerOptional = workerRepository.findById(data.getWorkerId());
 
+        Worker worker = workerOptional.get();
+
             if (workerOptional.isPresent()) {
-            Worker worker = workerOptional.get();
+                if (!worker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                    !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
             worker.setCurrentSalary(data.getPaymentAmount());
             workerRepository.save(worker);
         } else {
@@ -60,7 +64,7 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
     }
 
     @Override
-    public Optional<MonthlySalary> update(Long id, MonthlySalaryDTO data) throws Exception {
+    public Optional<MonthlySalary> update(Long id, MonthlySalaryDTO data, User currentUser) throws Exception {
 
         Optional<MonthlySalary> optionalMonthlySalary = monthlySalaryRepository.findById(id);
 
@@ -69,6 +73,13 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
         }
 
         Optional<Worker> workerOptional = workerRepository.findById(data.getWorkerId());
+
+        Worker checkFilial = workerOptional.get();
+
+        if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                !currentUser.getRoles().contains(Role.ADMIN)) {
+            throw new AccessDeniedException("Restricted for this manager");
+        }
 
         if (workerOptional.isPresent()) {
             Worker worker = workerOptional.get();
@@ -92,8 +103,16 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
     }
 
     @Override
-    public void deleteById(Long id) {
-        if(!monthlySalaryRepository.existsById(id)) {
+    public void deleteById(Long id, User currentUser) {
+        Optional<MonthlySalary> optionalMonthlySalary = monthlySalaryRepository.findById(id);
+        MonthlySalary checkFilial = optionalMonthlySalary.get();
+
+        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                !currentUser.getRoles().contains(Role.ADMIN)) {
+            throw new AccessDeniedException("Restricted for this manager");
+        }
+
+        if(!optionalMonthlySalary.isPresent()) {
             logger.info("Store with id " + id + " does not exists");
         }
 
@@ -109,7 +128,16 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
     }
 
     @Override
-    public List<MonthlySalary> getMonthlySalariesByWorkerId(Long workerId) {
+    public List<MonthlySalary> getMonthlySalariesByWorkerId(Long workerId, User currentUser) {
+        Optional<MonthlySalary> optionalMonthlySalary = monthlySalaryRepository.findById(workerId);
+
+        MonthlySalary checkFilial = optionalMonthlySalary.get();
+
+        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                !currentUser.getRoles().contains(Role.ADMIN)) {
+            throw new AccessDeniedException("Restricted for this manager");
+        }
+
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new EntityNotFoundException("Worker not found with id: " + workerId));
 
@@ -118,7 +146,16 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
 
 
     @Override
-    public Optional<MonthlySalary> getById(Long id) throws Exception {
+    public Optional<MonthlySalary> getById(Long id, User currentUser) throws Exception {
+        Optional<MonthlySalary> optionalMonthlySalary = monthlySalaryRepository.findById(id);
+
+        MonthlySalary checkFilial = optionalMonthlySalary.get();
+
+        if (!checkFilial.getWorker().getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                !currentUser.getRoles().contains(Role.ADMIN)) {
+            throw new AccessDeniedException("Restricted for this manager");
+        }
+
         if (!monthlySalaryRepository.existsById(id)) {
             logger.info("Input with id " + id + " does not exists");
             return Optional.empty();

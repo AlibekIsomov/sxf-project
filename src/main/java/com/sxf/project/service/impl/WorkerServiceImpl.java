@@ -5,16 +5,15 @@ import com.sxf.project.dto.WorkerDTO;
 import com.sxf.project.entity.*;
 import com.sxf.project.repository.*;
 import com.sxf.project.service.WorkerService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -52,14 +51,18 @@ public class WorkerServiceImpl implements WorkerService {
     public Optional<Worker> getById(Long id, User currentUser) throws Exception {
 
         Optional<Worker> optionalWorker = workerRepository.findById(id);
-        if (optionalWorker.isPresent()) {
+        if (!optionalWorker.isPresent()) {
             Worker checkWorker = optionalWorker.get();
             if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
+                logger.info("Restricted");
+                return Optional.empty();
             }
+            return Optional.empty();
         }
         return workerRepository.findById(id);
     }
+
+
 
     @Override
     public Optional<Worker> create(WorkerDTO data, User currentUser) throws Exception {
@@ -68,26 +71,27 @@ public class WorkerServiceImpl implements WorkerService {
         // Check if the Filial exists
         if (!optionalFilial.isPresent()) {
             logger.info("Such ID filial does not exist!");
-
-            Filial checkFilial = optionalFilial.get();
-            if (!checkFilial.getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
             return Optional.empty();
 
         }
+        Filial checkFilial = optionalFilial.get();
+        if (!currentUser.getAssignedFilial().getId().equals(checkFilial.getUser().getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted");
+            return Optional.empty();
+        }
 
+            // Create a new Worker
+            Worker worker = new Worker();
+            worker.setName(data.getName());
+            worker.setSurname(data.getSurname());
+            worker.setJobDescription(data.getJobDescription());
+            worker.setFilial(optionalFilial.get());
 
+            return Optional.of(workerRepository.save(worker));
 
-        // Create a new Worker
-        Worker worker = new Worker();
-        worker.setName(data.getName());
-        worker.setSurname(data.getSurname());
-        worker.setJobDescription(data.getJobDescription());
-        worker.setFilial(optionalFilial.get());
-
-        return Optional.of(workerRepository.save(worker));
     }
+
+
 
     @Override
     public Optional<Worker> update(Long id, WorkerDTO data, User currentUser) throws Exception {
@@ -136,20 +140,22 @@ public class WorkerServiceImpl implements WorkerService {
     }
 
     @Override
-    public void deleteById(Long id, User currentUser) {
+    public Optional<Object> deleteById(Long id, User currentUser) {
         Optional<Worker> optionalWorker = workerRepository.findById(id);
+        Worker checkWorker = optionalWorker.get();
 
-
-        if (optionalWorker.isPresent()) {
-            Worker checkWorker = optionalWorker.get();
-            if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId())) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
+        if (!checkWorker.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted");
+            return Optional.empty();
+        }
+        if(!workerRepository.existsById(id)) {
+            logger.info("Input with id " + id + " does not exists");
         }
         List<MonthlySalaryPayment> paymentsToDelete = monthlySalaryPaymentRepository.findAllByMonthlySalaryId(id);
         monthlySalaryPaymentRepository.deleteAll(paymentsToDelete);
         monthlySalaryRepository.deleteAll(monthlySalaryRepository.findAllByWorkerId(id));
         workerRepository.deleteById(id);
+        return null;
     }
 
     @Override

@@ -4,8 +4,9 @@ package com.sxf.project.controller;
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.entity.Filial;
 import com.sxf.project.repository.FilialRepository;
-import com.sxf.project.response.ResourceNotFoundException;
+import com.sxf.project.payload.ResourceNotFoundException;
 import com.sxf.project.service.FilialService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -47,7 +48,7 @@ public class FilialController {
     public ResponseEntity<Filial> getById(@PathVariable Long id) throws Exception {
         return filialService.getById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping
     public ResponseEntity<Filial> create(@RequestBody FilialDTO data) throws Exception {
         try {
@@ -125,7 +126,7 @@ public class FilialController {
 
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    @GetMapping("/{filialId}")
+    @GetMapping("getUser/{filialId}")
     public ResponseEntity<Filial> getFilialForUser(@PathVariable Long filialId, @RequestParam Long userId) throws AccessDeniedException {
         Filial filial = filialService.getFilialForUser(filialId, userId);
         return ResponseEntity.ok(filial);

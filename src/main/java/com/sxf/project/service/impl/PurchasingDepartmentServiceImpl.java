@@ -1,8 +1,7 @@
 package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.PurchasingDepartmentDTO;
-import com.sxf.project.entity.ProfilePD;
-import com.sxf.project.entity.PurchasingDepartment;
+import com.sxf.project.entity.*;
 import com.sxf.project.repository.ProfilePDRepository;
 import com.sxf.project.repository.PurchasingDepartmentRepository;
 import com.sxf.project.service.PurchasingDepartmentService;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -34,7 +34,20 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
-    public Optional<PurchasingDepartment> getById(Long id) throws Exception {
+    public Optional<PurchasingDepartment> getById(Long id, User currentUser) throws Exception {
+        Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
+
+        if (!optionalProfilePD.isPresent()) {
+            logger.info("Such ID filial does not exist!");
+            return Optional.empty();
+        }
+
+        ProfilePD checkFilial = optionalProfilePD.get();
+        if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
+                !currentUser.getRoles().contains(Role.ADMIN)) {
+            throw new AccessDeniedException("Restricted for this manager");
+        }
+
         if(!purchasingDepartmentRepository.existsById(id)) {
             logger.info("ProfilePD with id " + id + " does not exists");
             return Optional.empty();
@@ -43,12 +56,17 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
-    public Optional<PurchasingDepartment> create(PurchasingDepartmentDTO data) throws Exception {
+    public Optional<PurchasingDepartment> create(PurchasingDepartmentDTO data, User currentUser) throws Exception {
 
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfileDbId());
 
         if (!optionalProfilePD.isPresent()) {
             logger.info("Such ID filial does not exist!");
+
+            ProfilePD checkFilial = optionalProfilePD.get();
+            if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
         }
 
         PurchasingDepartment purchasingDepartment = new PurchasingDepartment();
@@ -63,10 +81,21 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
-    public Optional<PurchasingDepartment> update(Long id, PurchasingDepartmentDTO data) throws Exception {
+    public Optional<PurchasingDepartment> update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception {
         Optional<PurchasingDepartment> optionalPurchasingDepartmentUpdate = purchasingDepartmentRepository.findById(id);
+        Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfileDbId());
+
+        if (!optionalProfilePD.isPresent()) {
+            logger.info("Such ID filial does not exist!");
+
+            ProfilePD checkFilial = optionalProfilePD.get();
+            if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                throw new AccessDeniedException("Restricted for this manager");
+            }
+        }
 
         if (optionalPurchasingDepartmentUpdate.isPresent()) {
+
             PurchasingDepartment PurchasingDepartmentUpdate = optionalPurchasingDepartmentUpdate.get();
 
             PurchasingDepartmentUpdate.setName(data.getName());
@@ -74,6 +103,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
             PurchasingDepartmentUpdate.setNumber(data.getNumber());
             PurchasingDepartmentUpdate.setPayment(data.getPayment());
 
+            PurchasingDepartmentUpdate.setProfilePD(optionalProfilePD.get());
 
             // Save the updated
             return Optional.of(purchasingDepartmentRepository.save(PurchasingDepartmentUpdate));
@@ -98,9 +128,20 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id, User currentUser) {
         if(!purchasingDepartmentRepository.existsById(id)) {
             logger.info("ProfilePD with id " + id + " does not exists");
+
+            Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
+
+            if (!optionalProfilePD.isPresent()) {
+                logger.info("Such ID filial does not exist!");
+
+                ProfilePD checkFilial = optionalProfilePD.get();
+                if (!checkFilial.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                    throw new AccessDeniedException("Restricted for this manager");
+                }
+            }
         };
         purchasingDepartmentRepository.deleteById(id);
     }

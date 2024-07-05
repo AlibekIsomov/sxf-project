@@ -47,17 +47,30 @@ public class AccountController {
     @PostMapping("/authenticate")
     public ResponseEntity<Token> login(@RequestBody UserSpecial userSpecial) throws Exception {
         try {
+            // Authenticate user using authenticationManager
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     userSpecial.getUsername(), userSpecial.getPassword()));
+
         } catch (DisabledException e) {
+            // Handle if user is disabled
             throw new Exception("USER_DISABLED", e);
+
         } catch (BadCredentialsException e) {
+            // Handle if credentials are invalid
             throw new Exception("INVALID_CREDENTIALS", e);
+
         } catch (Exception ex) {
+            // Catch any other exceptions
             ex.printStackTrace();
         }
+
+        // If authentication is successful, load UserDetails
         UserDetails userDetails = userProvider.loadUserByUsername(userSpecial.getUsername());
+
+        // Generate JWT token
         String token = jwtTokenUtil.generateToken(userDetails, true);
+
+        // Return ResponseEntity with JWT token in body
         return ResponseEntity.ok(new Token(token));
     }
     @PostMapping("/register")

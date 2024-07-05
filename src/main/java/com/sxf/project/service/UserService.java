@@ -7,6 +7,8 @@ import com.sxf.project.entity.User;
 import com.sxf.project.vm.UserVM;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
