@@ -93,7 +93,12 @@ public class ReportController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id, @RequestBody ReportDTO data, @CurrentUser User currentUser) {
-        reportService.deleteById(id, currentUser);
+    public ResponseEntity<?> deleteById(@PathVariable Long id, @CurrentUser User currentUser) {
+        try {
+            reportService.deleteById(id, currentUser);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Siz uchun emas");
+        }
     }
 }
