@@ -21,11 +21,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -56,6 +58,17 @@ public class FilialServiceImpl implements FilialService {
             return Optional.empty();
         }
         return filialRepository.findById(id);
+    }
+
+    @Override
+    public List<Filial> getAllManagers(User user) {
+        if (user.getAssignedFilial() != null && user.getAssignedFilial().getId() != null) {
+            return filialRepository.findAllById(Collections.singleton(user.getAssignedFilial().getId()));
+        } else {
+            logger.info("User is not assigned to any filial");
+            ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
+            return Collections.emptyList();
+        }
     }
 
     @Override

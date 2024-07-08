@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PurchasingDepartmentRepository extends JpaRepository<PurchasingDepartment, Long> {
     Page<PurchasingDepartment> findAllByName(String name, Pageable pageable);
@@ -16,6 +18,8 @@ public interface PurchasingDepartmentRepository extends JpaRepository<Purchasing
     Long calculateTotalFullAmountByProfilePD(@Param("profilePDId") Long profilePDId);
 
     @Query("SELECT pd.payment - SUM(pd.number * pd.price) FROM PurchasingDepartment pd WHERE pd.profilePD.id = :profilePDId GROUP BY pd.profilePD")
-    Long calculateRemainingPaymentByProfilePD(@Param("profilePDId") Long profilePDId);
-}
+    Long calculateRemainingPaymentByProfilePD(@Param("profilePDId") Long profilePDId);;
+
+    @Query("SELECT msp FROM PurchasingDepartment msp JOIN msp.profilePD  w WHERE w.filial.id = :filialId")
+    List<PurchasingDepartment> findByFilialId(@Param("filialId") Long filialId);}
 

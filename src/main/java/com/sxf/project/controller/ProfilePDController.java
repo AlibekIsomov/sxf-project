@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -43,6 +44,25 @@ public class ProfilePDController {
     @GetMapping("/{id}")
     public ResponseEntity<ProfilePD> getById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
         return profilePDService.getById(id, currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/filial/{id}")
+    public ResponseEntity<?> getWorkersByFilial(@PathVariable Long id) {
+        List<ProfilePD> profilePDS = profilePDService.getAllByFilial(id);
+        if (profilePDS.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
+        }
+        return ResponseEntity.ok(profilePDS);
+    }
+
+    @GetMapping("/filial")
+    public ResponseEntity<?> getWorkersByFilial(@CurrentUser User currentUser) {
+        List<ProfilePD> profilePDS = profilePDService.getProfilePDByFilial(currentUser);
+        if (profilePDS.isEmpty()) {
+            return ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
+        }
+
+        return ResponseEntity.ok(profilePDS);
     }
 
     @PostMapping

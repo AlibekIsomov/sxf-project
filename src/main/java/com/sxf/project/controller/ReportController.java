@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -53,6 +54,25 @@ public class ReportController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @GetMapping("/filial")
+    public ResponseEntity<?> getWorkersByFilial(@CurrentUser User currentUser) {
+        List<Report> reports = reportService.getReportByFilial(currentUser);
+        if (reports.isEmpty()) {
+            return ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
+        }
+
+        return ResponseEntity.ok(reports);
+    }
+
+    @GetMapping("/filial/{id}")
+    public ResponseEntity<?> getWorkersByFilial(@PathVariable Long id) {
+        List<Report> Report = reportService.getAllByFilial(id);
+        if (Report.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
+        }
+        return ResponseEntity.ok(Report);
     }
 
     @PutMapping("/{id}")

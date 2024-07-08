@@ -3,8 +3,10 @@ package com.sxf.project.controller;
 
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.entity.Filial;
+import com.sxf.project.entity.User;
 import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.payload.ResourceNotFoundException;
+import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.FilialService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,15 @@ public class FilialController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @GetMapping("/managers")
+    public ResponseEntity<List<Filial>> getAllManagers(@CurrentUser User currentUser) {
+        List<Filial> filialList = filialService.getAllManagers(currentUser);
+        if (filialList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return ResponseEntity.ok(filialList);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")

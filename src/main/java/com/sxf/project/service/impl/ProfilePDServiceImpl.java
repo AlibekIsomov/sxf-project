@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +47,22 @@ public class ProfilePDServiceImpl implements ProfilePDService {
     @Override
     public Page<ProfilePD> getAll(Pageable pageable) throws Exception {
         return profilePDRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<ProfilePD> getAllByFilial(Long id) {
+        return profilePDRepository.findAllByFilialId(id);
+    }
+
+    @Override
+    public List<ProfilePD> getProfilePDByFilial(User user) {
+        if (user.getAssignedFilial() != null && user.getAssignedFilial().getId() != null) {
+            return profilePDRepository.findAllByFilialId(user.getAssignedFilial().getId());
+        } else {
+            logger.info("User is not assigned to any filial");
+            ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
+            return Collections.emptyList();
+        }
     }
 
     @Override

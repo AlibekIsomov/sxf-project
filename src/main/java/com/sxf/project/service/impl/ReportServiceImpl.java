@@ -13,9 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,6 +41,17 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Page<Report> getAll(Pageable pageable) throws Exception {
         return reportRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Report> getReportByFilial(User user) {
+        if (user.getAssignedFilial() != null && user.getAssignedFilial().getId() != null) {
+            return reportRepository.findAllByFilialId(user.getAssignedFilial().getId());
+        } else {
+            logger.info("User is not assigned to any filial");
+            ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -68,6 +82,11 @@ public class ReportServiceImpl implements ReportService {
         return reportRepository.findById(id);
     }
 
+    @Override
+    public List<Report> getAllByFilial(Long id) {
+        return reportRepository.findAllByFilialId(id);
+    }
+
 
     @Override
     public Optional<Report> create(ReportDTO data, User currentUser) throws Exception {
@@ -95,7 +114,6 @@ public class ReportServiceImpl implements ReportService {
             return Optional.empty();
 
         }
-
 
         Report report = new Report();
         report.setName(data.getName());
@@ -139,7 +157,6 @@ public class ReportServiceImpl implements ReportService {
                 }
             }
         }
-
 
         if (!exsitingReport.isPresent()) {
             logger.info("Report with id " + id + " does not exist");
@@ -188,7 +205,6 @@ public class ReportServiceImpl implements ReportService {
         Optional<Report> exsitingReport = reportRepository.findById(id);
 
         if (exsitingReport.isPresent()) {
-            Report checkreport = exsitingReport.get();
             Filial workerFilial = exsitingReport.get().getFilial();
             Filial currentUserFilial = currentUser.getAssignedFilial();
 

@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -42,10 +44,20 @@ public class WorkerServiceImpl implements WorkerService {
     }
 
     @Override
-    public Page<Worker> getAllByFilial(Long filialId, Pageable pageable) {
-        return workerRepository.findByFilialId(filialId, pageable);
+    public List<Worker> getAllByFilial(Long id) {
+        return workerRepository.findAllByFilialId(id);
     }
 
+    @Override
+    public List<Worker> getWorkerByFilial(User user) {
+        if (user.getAssignedFilial() != null && user.getAssignedFilial().getId() != null) {
+            return workerRepository.findAllByFilialId(user.getAssignedFilial().getId());
+        } else {
+            logger.info("User is not assigned to any filial");
+            ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
+            return Collections.emptyList();
+        }
+    }
 
     @Override
     public Optional<Worker> getById(Long id, User currentUser) throws Exception {

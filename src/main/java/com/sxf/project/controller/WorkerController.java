@@ -18,10 +18,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -53,21 +55,31 @@ public class WorkerController{
         }
     }
 
+    @GetMapping("/filial")
+    public ResponseEntity<?> getWorkersByFilial(@CurrentUser User currentUser) {
+        List<Worker> workers = workerService.getWorkerByFilial(currentUser);
+        if (workers.isEmpty()) {
+            return ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
+        }
+
+        return ResponseEntity.ok(workers);
+    }
+
+    @GetMapping("/filial/{id}")
+    public ResponseEntity<?> getWorkersByFilial(@PathVariable Long id) {
+        List<Worker> workers = workerService.getAllByFilial(id);
+        if (workers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
+        }
+        return ResponseEntity.ok(workers);
+    }
 
     @GetMapping
     public ResponseEntity<Page<Worker>> getAll(Pageable pageable) throws Exception {
         return ResponseEntity.ok(workerService.getAll(pageable));
     }
 
-    @GetMapping("/byFilial")
-    public ResponseEntity<Page<Worker>> getAllByCurrentUserFilial(@CurrentUser User currentUser, Pageable pageable) throws Exception {
-        if (currentUser.getAssignedFilial() == null) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Long filialId = currentUser.getAssignedFilial().getId();
-        Page<Worker> workers = workerService.getAllByFilial(filialId, pageable);
-        return ResponseEntity.ok(workers);
-    }
+
 
     @PostMapping
     public ResponseEntity<Worker> create(@RequestBody WorkerDTO data, @AuthenticationPrincipal User currentUser) throws Exception {

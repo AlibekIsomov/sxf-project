@@ -12,4 +12,6 @@ public interface ProfilePDRepository extends JpaRepository<ProfilePD,Long> {
     List<ProfilePD> findByFilialId(Long filialId);
 
     Page<ProfilePD> findAllByName(String name, Pageable pageable);
+
+    List<ProfilePD> findAllByFilialId(Long id);
 }
