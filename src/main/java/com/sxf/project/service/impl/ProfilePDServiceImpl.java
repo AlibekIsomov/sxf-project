@@ -85,8 +85,8 @@ public class ProfilePDServiceImpl implements ProfilePDService {
         }
 
         if (optionalProfilePD.isPresent()) {
-            ProfilePD checkProfileDp = optionalProfilePD.get();
-        return Optional.empty();
+            logger.info("Such ID filial does not exist!");
+            return Optional.empty();
         }
         return profilePDRepository.findById(id);
     }

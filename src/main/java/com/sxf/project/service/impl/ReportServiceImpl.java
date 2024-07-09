@@ -58,27 +58,29 @@ public class ReportServiceImpl implements ReportService {
     public Optional<Report> getById(Long id, User currentUser) throws Exception {
 
         Optional<Report> exsitingReport = reportRepository.findById(id);
+
+        if (!exsitingReport.isPresent()) {
+            logger.info("Such ID filial does not exist!");
+            return Optional.empty();
+        }
+
         Report checkWorker = exsitingReport.get();
-        Filial workerFilial = checkWorker.getFilial();
+
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
-        // Check if the current user is not assigned to a filial and is not an admin
-        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
-            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-            return Optional.empty();
-        }
-
-        // If the current user has an assigned filial, check if it matches the worker's filial
-        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-            logger.info("Restricted: User's assigned filial does not match the worker's filial");
-            return Optional.empty();
-        }
-        if (exsitingReport.isPresent()) {
-            Report checkreport = exsitingReport.get();
-            if (!checkreport.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
+        if (currentUserFilial == null) {
+            if (!currentUser.getRoles().contains(Role.ADMIN)) {
+                logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+                return Optional.empty();
+            }
+        } else {
+            // If the current user has an assigned filial, check if it matches the checkFilial
+            if (!currentUserFilial.getId().equals(checkWorker.getFilial().getId())) {
+                logger.info("Restricted: User's assigned filial does not match the checkFilial");
+                return Optional.empty();
             }
         }
+
         return reportRepository.findById(id);
     }
 
