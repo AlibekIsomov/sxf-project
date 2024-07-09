@@ -2,6 +2,7 @@ package com.sxf.project.controller;
 
 
 import com.sxf.project.dto.PaymentStatisticDTO;
+import com.sxf.project.dto.PaymentStatisticsResponseDTO;
 import com.sxf.project.service.PaymentStatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,5 +28,17 @@ public class PaymentStatisticController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok(payments);
+    }
+
+    @GetMapping("/income/{filialId}")
+    public ResponseEntity<PaymentStatisticsResponseDTO> getIncome(@PathVariable Long filialId) {
+        PaymentStatisticsResponseDTO income = paymentService.getIncomeByFilialId(filialId);
+        return ResponseEntity.ok(income);
+    }
+
+    @GetMapping("/outcome/{filialId}")
+    public ResponseEntity<PaymentStatisticsResponseDTO> getOutcome(@PathVariable Long filialId) {
+        PaymentStatisticsResponseDTO outcome = paymentService.getOutcomeByFilialId(filialId);
+        return ResponseEntity.ok(outcome);
     }
 }

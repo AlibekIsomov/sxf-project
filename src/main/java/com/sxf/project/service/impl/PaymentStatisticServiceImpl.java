@@ -2,6 +2,7 @@ package com.sxf.project.service.impl;
 
 
 import com.sxf.project.dto.PaymentStatisticDTO;
+import com.sxf.project.dto.PaymentStatisticsResponseDTO;
 import com.sxf.project.entity.MonthlySalaryPayment;
 import com.sxf.project.entity.PurchasingDepartment;
 import com.sxf.project.entity.ReportPayment;
@@ -62,5 +63,55 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         }
 
         return payments;
+    }
+
+    @Override
+    public PaymentStatisticsResponseDTO getIncomeByFilialId(Long filialId) {
+        List<PaymentStatisticDTO> payments = new ArrayList<>();
+        double totalIncome = 0.0;
+
+        // Retrieve and classify ReportPayments (income)
+        List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialId(filialId);
+        for (ReportPayment reportPayment : reportPayments) {
+            String entityName = reportPayment.getReport().getName(); // Assuming Report has a getName method
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "ReportPayment", "income", entityName);
+            payments.add(paymentDTO);
+            totalIncome += reportPayment.getNewPayment();
+        }
+
+        PaymentStatisticsResponseDTO response = new PaymentStatisticsResponseDTO();
+        response.setPayments(payments);
+        response.setTotal(totalIncome);
+        return response;
+    }
+
+    @Override
+    public PaymentStatisticsResponseDTO getOutcomeByFilialId(Long filialId) {
+        List<PaymentStatisticDTO> payments = new ArrayList<>();
+        double totalOutcome = 0.0;
+
+        // Retrieve and classify PurchasingDepartment payments (outcome)
+        List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByFilialId(filialId);
+        for (PurchasingDepartment purchase : purchases) {
+            String entityName = purchase.getName();
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "PurchasingDepartment", "outcome", entityName);
+            payments.add(paymentDTO);
+            totalOutcome += purchase.getPayment();
+        }
+
+        // Retrieve and classify MonthlySalaryPayments (outcome)
+        List<MonthlySalaryPayment> salaryPayments = monthlySalaryPaymentRepository.findByFilialId(filialId);
+        for (MonthlySalaryPayment salaryPayment : salaryPayments) {
+            Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
+            String entityName = worker != null ? worker.getName() : "Unknown Worker";
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "MonthlySalaryPayment", "outcome", entityName);
+            payments.add(paymentDTO);
+            totalOutcome += salaryPayment.getPaymentAmount();
+        }
+
+        PaymentStatisticsResponseDTO response = new PaymentStatisticsResponseDTO();
+        response.setPayments(payments);
+        response.setTotal(totalOutcome);
+        return response;
     }
 }
