@@ -44,6 +44,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         }
 
         ProfilePD checkFilial = optionalProfilePD.get();
+        Filial filial = checkFilial.getFilial();
 
         // Check if the current user is not assigned to a filial and is not an admin
         if (currentUser == null && !currentUser.getRoles().contains(Role.ADMIN)) {
@@ -51,7 +52,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         }
 
         // If the current user has an assigned filial, check if it matches the worker's filial
-        if (currentUser != null && !currentUser.getId().equals(checkFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+        if (currentUser != null && !currentUser.getId().equals(filial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 

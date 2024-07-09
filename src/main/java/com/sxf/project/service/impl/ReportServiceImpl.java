@@ -58,8 +58,8 @@ public class ReportServiceImpl implements ReportService {
     public Optional<Report> getById(Long id, User currentUser) throws Exception {
 
         Optional<Report> exsitingReport = reportRepository.findById(id);
-
-        Filial workerFilial = exsitingReport.get().getFilial();
+        Report checkWorker = exsitingReport.get();
+        Filial workerFilial = checkWorker.getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
         // Check if the current user is not assigned to a filial and is not an admin
