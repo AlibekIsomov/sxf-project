@@ -187,13 +187,20 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
 
         Optional<Report> reportOptional = reportRepository.findById(reportId);
 
+        Filial Filialcheck = reportOptional.get().getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        // Check if the current user is not assigned to a filial and is not an admin
+        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        }
+
+        // If the current user has an assigned filial, check if it matches the worker's filial
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the worker's filial");
+        }
         if (reportOptional.isPresent()) {
             Report report = reportOptional.get();
-
-            if (!report.getFilial().getId().equals(currentUser.getAssignedFilial().getId()) &&
-                    !currentUser.getRoles().contains(Role.ADMIN)) {
-                throw new AccessDeniedException("Restricted for this manager");
-            }
             List<ReportPaymentDTO> paymentDTOs = report.getPayments()
                     .stream()
                     .map(this::convertToPaymentDTO)
