@@ -56,6 +56,7 @@ public class SecurityConfig  {
                         .requestMatchers("/api/account/authenticate").permitAll()
                         .requestMatchers("/api/fayl/download/{id}").permitAll()
                         .requestMatchers("/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling()
@@ -70,31 +71,6 @@ public class SecurityConfig  {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowCredentials(true);
-//        config.addAllowedOrigin("http://localhost:4200");
-//        config.addAllowedOrigin("http://localhost:5500");
-//        config.addAllowedOrigin("http://localhost:5501");
-//        config.addAllowedOrigin("http://localhost:5502");
-//        config.addAllowedOrigin("http://localhost:5173");
-//        config.addAllowedOrigin("http://185.198.152.35");
-//        config.addAllowedOrigin("https://sxf-cc.vercel.app");
-//        config.addAllowedOrigin("https://api.qarshimall.uz");
-//        config.addAllowedOrigin("https://dashboard.qarshimall.uz");
-//        config.addAllowedOrigin("http://api.qarshimall.uz");
-//        config.setAllowedMethods(List.of("GET","POST","PUT", "DELETE", "PATCH"));
-//        config.setAllowedHeaders(List.of("Authorization","Content-Type","recaptcha","Content-Disposition","Access-Control-Allow-Headers","Access-Control-Expose-Headers"));
-//        config.setExposedHeaders(Collections.singletonList("Content-Disposition"));
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        config.addAllowedHeader("*");
-//        config.addAllowedMethod("*");
-//        source.registerCorsConfiguration("/**", config);
-//        return new CorsFilter(source);
-//    }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
