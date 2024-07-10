@@ -75,4 +75,8 @@ public class Report {
     @LastModifiedBy
     @Column(name = "updated_by")
     private String updatedBy;
+
+    public Long getFullAmount() {
+        return this.square_meters * this.price;
+    }
 }

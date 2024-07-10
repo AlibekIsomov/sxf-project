@@ -69,6 +69,10 @@ public class ProfilePDServiceImpl implements ProfilePDService {
     public Optional<ProfilePD> getById(Long id, User currentUser) throws Exception {
 
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
+        if (optionalProfilePD.isPresent()) {
+            logger.info("Such ID filial does not exist!");
+            return Optional.empty();
+        }
         Filial workerFilial = optionalProfilePD.get().getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
@@ -84,10 +88,7 @@ public class ProfilePDServiceImpl implements ProfilePDService {
             return Optional.empty();
         }
 
-        if (optionalProfilePD.isPresent()) {
-            logger.info("Such ID filial does not exist!");
-            return Optional.empty();
-        }
+
         return profilePDRepository.findById(id);
     }
 
@@ -99,7 +100,8 @@ public class ProfilePDServiceImpl implements ProfilePDService {
 
         if (!optionalFilial.isPresent()) {
             logger.info("Such ID filial does not exist!");
-
+            Optional.empty();
+       }
             Filial checkFilial = optionalFilial.get();
 
             Filial assignedFilial = currentUser.getAssignedFilial();
@@ -115,9 +117,8 @@ public class ProfilePDServiceImpl implements ProfilePDService {
                     return Optional.empty();
                 }
             }
-            return Optional.empty();
 
-        }
+
 
         ProfilePD profilePD = new ProfilePD();
         profilePD.setName(data.getName());

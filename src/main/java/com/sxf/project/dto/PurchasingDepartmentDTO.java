@@ -19,6 +19,6 @@ public class PurchasingDepartmentDTO {
 
     private Long payment;
 
-    private Long profileDbId;
+    private Long profilePDId;
 
 }

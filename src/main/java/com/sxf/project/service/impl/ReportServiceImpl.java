@@ -97,7 +97,8 @@ public class ReportServiceImpl implements ReportService {
 
         if (!optionalFilial.isPresent()) {
             logger.info("Such ID filial does not exist!");
-
+            Optional.empty();
+        }
             Filial checkFilial = optionalFilial.get();
 
             Filial assignedFilial = currentUser.getAssignedFilial();
@@ -113,9 +114,9 @@ public class ReportServiceImpl implements ReportService {
                     return Optional.empty();
                 }
             }
-            return Optional.empty();
 
-        }
+
+
 
         Report report = new Report();
         report.setName(data.getName());

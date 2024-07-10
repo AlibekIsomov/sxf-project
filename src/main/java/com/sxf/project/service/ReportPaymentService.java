@@ -19,7 +19,7 @@ public interface ReportPaymentService {
 
     double calculateTotalPaymentsByReport(Long reportId);
 
-    double releasePaidAmount(Long reportId) throws NotFoundException;
+    double remainingPaidAmount(Long reportId) throws NotFoundException;
 
 
     void deletePayment(Long paymentId, User currentUser);

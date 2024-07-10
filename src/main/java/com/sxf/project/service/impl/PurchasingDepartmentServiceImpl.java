@@ -65,43 +65,54 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
 
     @Override
     public Optional<PurchasingDepartment> create(PurchasingDepartmentDTO data, User currentUser) throws Exception {
+        try {
+            Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
 
-        Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfileDbId());
 
-        if (!optionalProfilePD.isPresent()) {
-            logger.info("Such ID filial does not exist!");
-            return Optional.empty();
+            Filial Filialcheck = optionalProfilePD.get().getFilial();
+            Filial currentUserFilial = currentUser.getAssignedFilial();
+
+            // Check if the current user is not assigned to a filial and is not an admin
+            if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+                logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+                return Optional.empty();
+            }
+
+            // If the current user has an assigned filial, check if it matches the worker's filial
+            if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+                logger.info("Restricted: User's assigned filial does not match the worker's filial");
+                return Optional.empty();
+            }
+            if (!optionalProfilePD.isPresent()) {
+                logger.info("Such ID profileDB does not exist!");
+                return Optional.empty();
+            }
+            PurchasingDepartment purchasingDepartment = new PurchasingDepartment();
+            purchasingDepartment.setName(data.getName());
+            purchasingDepartment.setPrice(data.getPrice());
+            purchasingDepartment.setNumber(data.getNumber());
+            purchasingDepartment.setPayment(data.getPayment());
+            purchasingDepartment.setDescription(data.getDescription());
+
+            ProfilePD profilePD = optionalProfilePD.get();
+            if (profilePD.getId() == null) {
+                logger.error("ProfilePD ID is null");
+                throw new IllegalArgumentException("ProfilePD ID must not be null");
+            }
+            purchasingDepartment.setProfilePD(profilePD);
+
+            PurchasingDepartment savedPurchasingDepartment = purchasingDepartmentRepository.save(purchasingDepartment);
+            return Optional.of(savedPurchasingDepartment);
+        } catch (Exception e) {
+            logger.error("Error creating PurchasingDepartment", e);
+            throw new Exception("Error creating PurchasingDepartment", e);
         }
-
-        Filial Filialcheck = optionalProfilePD.get().getFilial();
-        Filial currentUserFilial = currentUser.getAssignedFilial();
-
-        // Check if the current user is not assigned to a filial and is not an admin
-        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
-            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-        }
-
-        // If the current user has an assigned filial, check if it matches the worker's filial
-        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
-            logger.info("Restricted: User's assigned filial does not match the worker's filial");
-        }
-
-        PurchasingDepartment purchasingDepartment = new PurchasingDepartment();
-        purchasingDepartment.setName(data.getName());
-        purchasingDepartment.setPrice(data.getPrice());
-        purchasingDepartment.setNumber(data.getNumber());
-        purchasingDepartment.setPayment(data.getPayment());
-        purchasingDepartment.setDescription(data.getDescription());
-
-        purchasingDepartment.setProfilePD(optionalProfilePD.get());
-
-        return Optional.of(purchasingDepartmentRepository.save(purchasingDepartment));
     }
 
     @Override
     public Optional<PurchasingDepartment> update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception {
         Optional<PurchasingDepartment> optionalPurchasingDepartmentUpdate = purchasingDepartmentRepository.findById(id);
-        Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfileDbId());
+        Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
 
         if (!optionalProfilePD.isPresent()) {
             logger.info("Such ID filial does not exist!");
