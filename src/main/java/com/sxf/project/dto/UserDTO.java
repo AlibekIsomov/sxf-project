@@ -11,7 +11,7 @@ public class UserDTO extends BaseDTO {
     private String name;
     private String surname;
     private String username;
-    private String email;
+    private String phoneNumber;
     private Set<Role> roles;
     private Boolean active;
 
@@ -25,7 +25,7 @@ public class UserDTO extends BaseDTO {
         this.name = user.getName();
         this.surname = user.getSurname();
         this.username = user.getUsername();
-        this.email = user.getEmail();
+        this.phoneNumber = user.getPhoneNumber();
         this.roles = user.getRoles();
         this.active = user.getActive();
         if (user.getAssignedFilial() != null) {
@@ -68,12 +68,12 @@ public class UserDTO extends BaseDTO {
         this.username = username;
     }
 
-    public String getEmail() {
-        return email;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Set<Role> getRoles() {

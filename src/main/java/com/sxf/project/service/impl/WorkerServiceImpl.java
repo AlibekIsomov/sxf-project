@@ -91,7 +91,7 @@ public class WorkerServiceImpl implements WorkerService {
 
     @Override
     public Optional<Worker> create(WorkerDTO data, User currentUser) throws Exception {
-        Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialID());
+        Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
         // Check if the Filial exists
         if (!optionalFilial.isPresent()) {

@@ -44,9 +44,6 @@ public class PurchasingDepartment {
     @JoinColumn(name = "profilePD_id")
     private ProfilePD profilePD;
 
-    @Transient
-    private Long fullAmount;
-
     @CreatedBy
     @Column(name = "created_by", nullable=false, updatable=false)
     private String createdBy;

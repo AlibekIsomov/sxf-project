@@ -91,6 +91,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         purchasingDepartment.setPrice(data.getPrice());
         purchasingDepartment.setNumber(data.getNumber());
         purchasingDepartment.setPayment(data.getPayment());
+        purchasingDepartment.setDescription(data.getDescription());
 
         purchasingDepartment.setProfilePD(optionalProfilePD.get());
 
@@ -127,7 +128,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
             PurchasingDepartment PurchasingDepartmentUpdate = optionalPurchasingDepartmentUpdate.get();
 
             PurchasingDepartmentUpdate.setName(data.getName());
-            PurchasingDepartmentUpdate.setNumber(data.getNumber());
+            PurchasingDepartmentUpdate.setPrice(data.getPrice());
             PurchasingDepartmentUpdate.setNumber(data.getNumber());
             PurchasingDepartmentUpdate.setPayment(data.getPayment());
 

@@ -53,7 +53,7 @@ public class UserController extends AbstractDTOController<User, UserDTO> {
         existingUser.setName(updatedUserDetails.getName());
         existingUser.setSurname(updatedUserDetails.getSurname());
         existingUser.setUsername(updatedUserDetails.getUsername());
-        existingUser.setEmail(updatedUserDetails.getEmail());
+        existingUser.setPhoneNumber(updatedUserDetails.getPhoneNumber());
         existingUser.setRoles(updatedUserDetails.getRoles());
 
         // Save the updated user

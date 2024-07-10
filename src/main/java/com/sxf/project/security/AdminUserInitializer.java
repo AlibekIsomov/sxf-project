@@ -34,5 +34,6 @@ public class AdminUserInitializer implements CommandLineRunner {
             u.setRoles(Set.of(Role.ADMIN));
             userRepository.save(u);
         }
+
     }
 }

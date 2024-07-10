@@ -15,7 +15,7 @@ public interface UserRepository extends DistributedRepository<User> {
 
     public Page<User> findAllByOrderByIdDesc(Pageable pageable);
 
-    public Page<User> findAllByIdOrNameContainsIgnoreCaseOrSurnameContainsIgnoreCaseOrUsernameContainsIgnoreCaseOrEmailContainsIgnoreCase(Long id, String name, String surname, String username, String email, Pageable pageable);
+    public Page<User> findAllByIdOrNameContainsIgnoreCaseOrSurnameContainsIgnoreCaseOrUsernameContainsIgnoreCaseOrPhoneNumberContainsIgnoreCase(Long id, String name, String surname, String username, String phoneNumber, Pageable pageable);
     
 
     List<User> findAllByRolesContains(Role role);
@@ -23,6 +23,6 @@ public interface UserRepository extends DistributedRepository<User> {
 
     Optional<User> findByUsername(String username);;
 
-    Optional<Object> findByEmail(String username);
+    Optional<Object> findByPhoneNumber(String phoneNumber);
 
 }

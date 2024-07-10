@@ -13,6 +13,8 @@ public class PurchasingDepartmentDTO {
 
     private Long price;
 
+    private String description;
+
     private Long number;
 
     private Long payment;

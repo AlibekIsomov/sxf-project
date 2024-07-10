@@ -17,6 +17,10 @@ public class FilialDTO {
 
     private String description;
 
+    private String location;
+
+    private long salesDepartment;
+
     private Long FileEntityId;
 
     private Set<UserDTO> managers;

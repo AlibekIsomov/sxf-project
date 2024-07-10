@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sxf.project.security.UserSpecial;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,14 +12,11 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -47,7 +43,7 @@ public class User extends DistributedEntity  implements UserDetails, Serializabl
     @Column(nullable = false)
     private String password;
 
-    private String email;
+    private String phoneNumber;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role",
@@ -62,12 +58,12 @@ public class User extends DistributedEntity  implements UserDetails, Serializabl
     @JsonBackReference
     private Filial assignedFilial;
 
-    public User(String name, String surname, String email, String username, Set<Role> roles, Filial assignedFilial) {
+    public User(String name, String surname, String phoneNumber, String username, Set<Role> roles, Filial assignedFilial) {
         this.name = name;
         this.surname = surname;
-        this.email = email;
         this.username = username;
         this.roles = roles;
+        this.phoneNumber = phoneNumber;
         this.assignedFilial = assignedFilial;
     }
 

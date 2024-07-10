@@ -11,6 +11,7 @@ import com.sxf.project.repository.FileRepository;
 import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.repository.UserRepository;
 import com.sxf.project.service.FilialService;
+import jakarta.persistence.Column;
 import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -77,6 +78,9 @@ public class FilialServiceImpl implements FilialService {
         Filial filial = new Filial();
         filial.setName(data.getName());
         filial.setDescription(data.getDescription());
+        filial.setLocation(data.getLocation());
+        filial.setSalesDepartment(data.getSalesDepartment());
+
 
         return Optional.of(filialRepository.save(filial));
     }
@@ -110,6 +114,8 @@ public class FilialServiceImpl implements FilialService {
 
         filialUpdate.setName(data.getName());
         filialUpdate.setDescription(data.getDescription());
+        filialUpdate.setLocation(data.getLocation());
+        filialUpdate.setSalesDepartment(data.getSalesDepartment());
 
         return Optional.of(filialRepository.save(filialUpdate));
     }
@@ -130,7 +136,9 @@ public class FilialServiceImpl implements FilialService {
         headerRow.createCell(0).setCellValue("ID");
         headerRow.createCell(1).setCellValue("Name");
         headerRow.createCell(2).setCellValue("Description");
-        headerRow.createCell(3).setCellValue("Created At");
+        headerRow.createCell(3).setCellValue("Location");
+        headerRow.createCell(4).setCellValue("Sales Department");
+        headerRow.createCell(5).setCellValue("Created At");
 
         int rowIdx = 1;
         for (Filial profile : profiles) {
@@ -138,7 +146,9 @@ public class FilialServiceImpl implements FilialService {
             row.createCell(0).setCellValue(profile.getId());
             row.createCell(1).setCellValue(profile.getName());
             row.createCell(2).setCellValue(profile.getDescription());
-            row.createCell(3).setCellValue(profile.getCreatedAt().toString());
+            row.createCell(3).setCellValue(profile.getLocation());
+            row.createCell(4).setCellValue(profile.getSalesDepartment());
+            row.createCell(5).setCellValue(profile.getCreatedAt().toString());
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

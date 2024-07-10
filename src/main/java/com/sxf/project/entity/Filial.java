@@ -35,6 +35,12 @@ public class Filial {
     @Column(name = "description", length=600)
     private String description;
 
+    @Column(name = "location", length=600)
+    private String location;
+
+    @Column(name = "sales_department", length=600)
+    private long salesDepartment;
+
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "file_entity_id")
     private FileEntity fileEntity;
