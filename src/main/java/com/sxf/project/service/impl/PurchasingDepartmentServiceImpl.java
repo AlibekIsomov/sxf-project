@@ -145,8 +145,6 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
             PurchasingDepartmentUpdate.setNumber(data.getNumber());
             PurchasingDepartmentUpdate.setPayment(data.getPayment());
             PurchasingDepartmentUpdate.setDescription(data.getDescription());
-            
-            PurchasingDepartmentUpdate.setProfilePD(optionalProfilePD.get());
 
             // Save the updated
             return Optional.of(purchasingDepartmentRepository.save(PurchasingDepartmentUpdate));

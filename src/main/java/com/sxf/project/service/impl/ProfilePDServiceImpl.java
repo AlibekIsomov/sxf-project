@@ -173,9 +173,6 @@ public class ProfilePDServiceImpl implements ProfilePDService {
         profilePDUpdate.setName(data.getName());
         profilePDUpdate.setDescription(data.getDescription());
 
-
-        profilePDUpdate.setFilial(optionalFilial.get());
-
         return Optional.of(profilePDRepository.save(profilePDUpdate));
     }
 
