@@ -129,16 +129,18 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
         return paymentRepository.calculateTotalPaymentsByReport(report);
     }
 
-    @Override
     public double remainingPaidAmount(Long reportId) {
-        Report report = paymentRepository.findById(reportId)
-                .orElseThrow(() ->  new EntityNotFoundException("Report not found for id: " + reportId)).getReport();
+        ReportPayment reportPayment = paymentRepository.findById(reportId)
+                .orElseThrow(() -> new EntityNotFoundException("Report not found for id: " + reportId));
+
+        Report report = reportPayment.getReport();
 
         double totalAmount = report.getFullAmount();
         double paidAmount = paymentRepository.calculateTotalPaymentsByReport(report);
 
         return totalAmount - paidAmount;
     }
+
     @Override
     public void deletePayment(Long paymentId, User currentUser) {
         Optional<ReportPayment> paymentOptional = paymentRepository.findById(paymentId);
@@ -146,18 +148,15 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
         if (paymentOptional.isPresent()) {
             ReportPayment paymentToDelete = paymentOptional.get();
 
-            // Remove the payment from the associated store's payments list
             Report report = paymentToDelete.getReport();
 
             Filial Filialcheck = report.getFilial();
             Filial currentUserFilial = currentUser.getAssignedFilial();
 
-            // Check if the current user is not assigned to a filial and is not an admin
             if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
                 logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
             }
 
-            // If the current user has an assigned filial, check if it matches the worker's filial
             if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
                 logger.info("Restricted: User's assigned filial does not match the worker's filial");
             }
@@ -165,13 +164,8 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
             if (report != null) {
                 report.getPayments().remove(paymentToDelete);
             }
-
-            // Delete the payment from the database
             paymentRepository.delete(paymentToDelete);
         } else {
-            // Handle the case where the payment with the given id is not found
-            // You can throw an exception, log a message, or handle it in another way.
-            // For simplicity, I'll log a message.
             System.out.println("Payment with id " + paymentId + " not found");
         }
     }
