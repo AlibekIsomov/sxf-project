@@ -7,6 +7,7 @@ import com.sxf.project.repository.ReportPaymentRepository;
 import com.sxf.project.repository.ReportRepository;
 import com.sxf.project.service.ReportPaymentService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
     @Autowired
     ReportRepository reportRepository;
 
-
+    @Transactional
     @Override
     public ResponseEntity<ReportPayment> addPayment(Long reportId, Long newPayment, User currentUser) {
         Optional<Report> reportOptional = reportRepository.findById(reportId);
@@ -128,12 +129,16 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
         return paymentRepository.calculateTotalPaymentsByReport(report);
     }
 
-        @Override
-        public double remainingPaidAmount(Long reportId) {
-            Report report = reportRepository.findById(reportId)
-                    .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
-            return paymentRepository.calculateRemainingPaymentByReport(report);
-        }
+    @Override
+    public double remainingPaidAmount(Long reportId) {
+        Report report = paymentRepository.findById(reportId)
+                .orElseThrow(() ->  new EntityNotFoundException("Report not found for id: " + reportId)).getReport();
+
+        double totalAmount = report.getPrice();
+        double paidAmount = paymentRepository.calculateTotalPaymentsByReport(report);
+
+        return totalAmount - paidAmount;
+    }
     @Override
     public void deletePayment(Long paymentId, User currentUser) {
         Optional<ReportPayment> paymentOptional = paymentRepository.findById(paymentId);

@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +89,7 @@ public class ReportServiceImpl implements ReportService {
         return reportRepository.findAllByFilialId(id);
     }
 
-
+    @Transactional
     @Override
     public Optional<Report> create(ReportDTO data, User currentUser) throws Exception {
 
