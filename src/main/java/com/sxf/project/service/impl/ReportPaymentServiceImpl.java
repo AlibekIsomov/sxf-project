@@ -124,24 +124,17 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
             Report report = reportRepository.findById(reportId)
                     .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
 
-            return paymentRepository.calculateTotalPaymentsByReport(report);
+            return paymentRepository.calculateTotalPaymentsByReport(report.getId());
         }
 
         @Override
         public double remainingPaidAmount(Long reportId) {
-        // Fetch the report from the database (assuming a Report entity exists)
-             Report report = paymentRepository.findById(reportId)
-                .orElseThrow(() ->  new EntityNotFoundException("Report not found for id: " + reportId)).getReport();
+            Report report = reportRepository.findById(reportId)
+                    .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
 
-        // Business logic to calculate the remaining amount
-            double totalAmount = report.getFullAmount();
-            double paidAmount = calculateTotalPaymentsByReport(reportId);
+            return paymentRepository.calculateRemainingPaymentByReport(report.getId());
 
-
-            return totalAmount - paidAmount;
-    }
-
-
+        }
     @Override
     public void deletePayment(Long paymentId, User currentUser) {
         Optional<ReportPayment> paymentOptional = paymentRepository.findById(paymentId);

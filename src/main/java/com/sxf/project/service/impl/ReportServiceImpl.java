@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -115,9 +114,6 @@ public class ReportServiceImpl implements ReportService {
                 }
             }
 
-
-
-
         Report report = new Report();
         report.setName(data.getName());
         report.setPrice(data.getPrice());
@@ -143,7 +139,9 @@ public class ReportServiceImpl implements ReportService {
         Optional<Report> exsitingReport = reportRepository.findById(id);
 
         if (exsitingReport.isPresent()) {
-            Report checkreport = exsitingReport.get();
+            logger.info("Report with id " + id + " does not exist");
+            return Optional.empty();
+        }
             Filial checkFilial = optionalFilial.get();
 
             Filial assignedFilial = currentUser.getAssignedFilial();
@@ -159,12 +157,6 @@ public class ReportServiceImpl implements ReportService {
                     return Optional.empty();
                 }
             }
-        }
-
-        if (!exsitingReport.isPresent()) {
-            logger.info("Report with id " + id + " does not exist");
-            return Optional.empty();
-        }
 
         Report reportToUpdate = exsitingReport.get();
 
@@ -192,7 +184,6 @@ public class ReportServiceImpl implements ReportService {
             }
         }
 
-        // Update the Store entity with the new data
         reportToUpdate.setName(data.getName());
         reportToUpdate.setPrice(data.getPrice());
         reportToUpdate.setBlock(data.getBlock());

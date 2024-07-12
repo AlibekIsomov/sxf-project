@@ -1,7 +1,6 @@
 package com.sxf.project.controller;
 
 
-
 import com.sxf.project.dto.MonthlySalaryDTO;
 import com.sxf.project.entity.MonthlySalary;
 import com.sxf.project.entity.User;
@@ -44,7 +43,7 @@ public class MonthlySalaryController {
     public ResponseEntity<MonthlySalary> create(@RequestBody MonthlySalaryDTO data,
                                                 @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<MonthlySalary> createdMonthlySalary = monthlySalaryService.create(data,currentUser);
+            Optional<MonthlySalary> createdMonthlySalary = monthlySalaryService.create(data, currentUser);
 
             if (createdMonthlySalary.isPresent()) {
                 return ResponseEntity.ok(createdMonthlySalary.get());

@@ -1,5 +1,6 @@
 package com.sxf.project.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,6 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import jakarta.persistence.*;;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
@@ -25,7 +25,7 @@ public class PurchasingDepartment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name",unique=true, nullable=false , length=120)
+    @Column(name = "name", unique = true, nullable = false, length = 120)
     private String name;
 
     @Column(name = "price", nullable = false)
@@ -45,7 +45,7 @@ public class PurchasingDepartment {
     private ProfilePD profilePD;
 
     @CreatedBy
-    @Column(name = "created_by", nullable=false, updatable=false)
+    @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 
     @CreatedDate

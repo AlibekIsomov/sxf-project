@@ -15,11 +15,12 @@ public interface PurchasingDepartmentRepository extends JpaRepository<Purchasing
     Page<PurchasingDepartment> findAllByName(String name, Pageable pageable);
 
     @Query("SELECT SUM(pd.number * pd.price) FROM PurchasingDepartment pd WHERE pd.profilePD.id = :profilePDId")
-    Long calculateTotalFullAmountByProfilePD(@Param("profilePDId") Long profilePDId);
+    Long calculateTotalFullAmountByProfilePD(@Param("profilePDId") Long profilePdId);
 
     @Query("SELECT pd.payment - SUM(pd.number * pd.price) FROM PurchasingDepartment pd WHERE pd.profilePD.id = :profilePDId GROUP BY pd.profilePD")
-    Long calculateRemainingPaymentByProfilePD(@Param("profilePDId") Long profilePDId);;
+    Long calculateRemainingPaymentByProfilePD(@Param("profilePDId") Long profilePdId);
 
     @Query("SELECT msp FROM PurchasingDepartment msp JOIN msp.profilePD  w WHERE w.filial.id = :filialId")
-    List<PurchasingDepartment> findByFilialId(@Param("filialId") Long filialId);}
+    List<PurchasingDepartment> findByFilialId(@Param("filialId") Long filialId);
+}
 

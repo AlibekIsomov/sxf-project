@@ -7,37 +7,31 @@ import com.sxf.project.entity.Worker;
 import com.sxf.project.repository.WorkerRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.WorkerService;
-import com.sxf.project.service.impl.WorkerServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 
-
 @RestController
 @RequestMapping("/api/worker")
-public class WorkerController{
+public class WorkerController {
 
+    private static final Logger logger = LoggerFactory.getLogger(WorkerController.class);
     @Autowired
     WorkerService workerService;
     @Autowired
     WorkerRepository workerRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkerController.class);
 
     @GetMapping("/{id}")
     public ResponseEntity<Worker> getById(@PathVariable Long id, @CurrentUser User currentUser) {
@@ -80,7 +74,6 @@ public class WorkerController{
     }
 
 
-
     @PostMapping
     public ResponseEntity<Worker> create(@RequestBody WorkerDTO data, @AuthenticationPrincipal User currentUser) throws Exception {
         try {
@@ -99,7 +92,7 @@ public class WorkerController{
 
     @PutMapping("/{id}")
     public ResponseEntity<Worker> update(@PathVariable Long id,
-                                         @RequestBody WorkerDTO data , @CurrentUser User currentUser) {
+                                         @RequestBody WorkerDTO data, @CurrentUser User currentUser) {
         try {
             Optional<Worker> updatedWorker = workerService.update(id, data, currentUser);
 

@@ -1,7 +1,6 @@
 package com.sxf.project.service.impl;
 
 
-
 import com.sxf.project.converter.AbstractDTOConverter;
 import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.Role;
@@ -51,7 +50,7 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
     @Override
     public boolean changePassword(UserVM vm) {
         Optional<User> user = userRepository.findByUsername(vm.getUsername());
-        if(user.isPresent() && encoder.matches(vm.getOldPassword(),user.get().getPassword())){
+        if (user.isPresent() && encoder.matches(vm.getOldPassword(), user.get().getPassword())) {
             user.get().setPassword(encoder.encode(vm.getNewPassword()));
             userRepository.save(user.get());
             return true;
@@ -61,7 +60,7 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
     }
 
     @Override
-    public UserDTO getCurrentUser(){
+    public UserDTO getCurrentUser() {
         String username = getPrincipal();
         if (username != null)
             return userRepository.findByUsername(username).map(UserDTO::new).orElse(null);
@@ -76,12 +75,11 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
     @Override
     public Page<User> search(String key, Pageable pageable) {
 
-        try{
-            Long n=Long.parseLong(key);
-            return userRepository.findAllByIdOrNameContainsIgnoreCaseOrSurnameContainsIgnoreCaseOrUsernameContainsIgnoreCaseOrPhoneNumberContainsIgnoreCase(n,key,key,key,key,pageable);
-        }
-        catch (Exception x) {
-            return userRepository.findAllByIdOrNameContainsIgnoreCaseOrSurnameContainsIgnoreCaseOrUsernameContainsIgnoreCaseOrPhoneNumberContainsIgnoreCase((long)-1,key,key,key,key, pageable);
+        try {
+            Long n = Long.parseLong(key);
+            return userRepository.findAllByIdOrNameContainsIgnoreCaseOrSurnameContainsIgnoreCaseOrUsernameContainsIgnoreCaseOrPhoneNumberContainsIgnoreCase(n, key, key, key, key, pageable);
+        } catch (Exception x) {
+            return userRepository.findAllByIdOrNameContainsIgnoreCaseOrSurnameContainsIgnoreCaseOrUsernameContainsIgnoreCaseOrPhoneNumberContainsIgnoreCase((long) -1, key, key, key, key, pageable);
         }
     }
 

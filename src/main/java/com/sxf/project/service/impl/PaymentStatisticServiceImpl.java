@@ -31,7 +31,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
     private MonthlySalaryPaymentRepository monthlySalaryPaymentRepository;
 
     @Autowired
-    private WorkerRepository workerRepository; // Add repository to fetch Worker details
+    private WorkerRepository workerRepository;
 
     @Override
     public List<PaymentStatisticDTO> getPaymentsByFilialId(Long filialId) {
@@ -40,7 +40,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         // Retrieve and classify ReportPayments
         List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialId(filialId);
         for (ReportPayment reportPayment : reportPayments) {
-            String entityName = reportPayment.getReport().getName(); // Assuming Report has a getName method
+            String entityName = reportPayment.getReport().getName();
             PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "ReportPayment", "income", entityName);
             payments.add(paymentDTO);
         }

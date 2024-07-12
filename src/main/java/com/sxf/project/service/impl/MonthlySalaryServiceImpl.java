@@ -50,22 +50,21 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
             return Optional.empty();
         }
-            if (workerOptional.isPresent()) {
-                 return Optional.empty();
-            }
-            else {
-                logger.info("Such ID worker does not exist!");
-            }
+        if (workerOptional.isPresent()) {
+            return Optional.empty();
+        } else {
+            logger.info("Such ID worker does not exist!");
+        }
 
-            worker.setCurrentSalary(data.getPaymentAmount());
-            workerRepository.save(worker);
-            MonthlySalary monthlySalary = new MonthlySalary();
+        worker.setCurrentSalary(data.getPaymentAmount());
+        workerRepository.save(worker);
+        MonthlySalary monthlySalary = new MonthlySalary();
 
-            monthlySalary.setMonthDate(data.getMonthDate());
-            monthlySalary.setStatus(PaymentStatus.valueOf(data.getStatus()));
-            monthlySalary.setPaymentAmount(data.getPaymentAmount());
-            monthlySalary.setPaidAmount(data.getPaidAmount());
-            monthlySalary.setWorker(workerOptional.get());
+        monthlySalary.setMonthDate(data.getMonthDate());
+        monthlySalary.setStatus(PaymentStatus.valueOf(data.getStatus()));
+        monthlySalary.setPaymentAmount(data.getPaymentAmount());
+        monthlySalary.setPaidAmount(data.getPaidAmount());
+        monthlySalary.setWorker(workerOptional.get());
 
         return Optional.of(monthlySalaryRepository.save(monthlySalary));
 
@@ -106,13 +105,13 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
         }
 
 
-            MonthlySalary monthlySalary = optionalMonthlySalary.get();
+        MonthlySalary monthlySalary = optionalMonthlySalary.get();
 
-            monthlySalary.setMonthDate(data.getMonthDate());
-            monthlySalary.setStatus(PaymentStatus.valueOf(data.getStatus()));
-            monthlySalary.setPaymentAmount(data.getPaymentAmount());
-            monthlySalary.setPaidAmount(data.getPaidAmount());
-            monthlySalary.setWorker(workerOptional.get());
+        monthlySalary.setMonthDate(data.getMonthDate());
+        monthlySalary.setStatus(PaymentStatus.valueOf(data.getStatus()));
+        monthlySalary.setPaymentAmount(data.getPaymentAmount());
+        monthlySalary.setPaidAmount(data.getPaidAmount());
+        monthlySalary.setWorker(workerOptional.get());
 
         return Optional.of(monthlySalaryRepository.save(monthlySalary));
 
@@ -136,7 +135,7 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
-        if(!optionalMonthlySalary.isPresent()) {
+        if (!optionalMonthlySalary.isPresent()) {
             logger.info("Store with id " + id + " does not exists");
         }
 
@@ -202,7 +201,6 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
         }
         return monthlySalaryRepository.findById(id);
     }
-
 
 
 }

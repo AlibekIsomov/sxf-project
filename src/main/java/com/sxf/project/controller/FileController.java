@@ -1,10 +1,8 @@
 package com.sxf.project.controller;
 
 
-
 import com.sxf.project.entity.FileEntity;
 import com.sxf.project.service.FileService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -17,11 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.File;
 import java.util.List;
 
 
@@ -29,24 +26,19 @@ import java.util.List;
 @RequestMapping("/api/fayl")
 public class FileController {
 
-    private Logger logger = LoggerFactory.getLogger(FileController.class.getName());
-
-
+    private final FileService fileService;
+    private final Logger logger = LoggerFactory.getLogger(FileController.class.getName());
     private String ROOT_DIRECTORY = "files";
 
-    private final FileService fileService;
+    public FileController(FileService faylService) {
+        this.fileService = faylService;
+    }
 
     @Value("${system.root-directory}")
     private void setDirectory(String url) {
         this.ROOT_DIRECTORY = url;
 
     }
-
-
-    public FileController(FileService faylService) {
-        this.fileService = faylService;
-    }
-
 
     @GetMapping()
     public ResponseEntity<List<FileEntity>> getAll(@RequestParam(name = "key", required = false) String key,
@@ -75,7 +67,7 @@ public class FileController {
                 headers.add("Expires", "0");
 
                 MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
-                if(f.getType() != null){
+                if (f.getType() != null) {
                     mediaType = MediaType.parseMediaType(f.getType());
                 }
 

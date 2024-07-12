@@ -1,18 +1,15 @@
 package com.sxf.project.service;
 
 
-
 import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.User;
 import com.sxf.project.vm.UserVM;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
-public interface UserService extends CommonServiceDto<User, UserDTO>{
+public interface UserService extends CommonServiceDto<User, UserDTO> {
 //    public Optional<User> getByIdEntity(Long id);
 
 //    public List<UserDTO> getAll();
@@ -25,11 +22,11 @@ public interface UserService extends CommonServiceDto<User, UserDTO>{
 
 //    public void deleteById(Long id);
 
-    public boolean changePassword(UserVM userVM);
+    boolean changePassword(UserVM userVM);
 
     UserDTO getCurrentUser();
 
     Optional<User> getByUsername(String login);
-    
-    public Page<User> search(String key, Pageable pageable);
+
+    Page<User> search(String key, Pageable pageable);
 }

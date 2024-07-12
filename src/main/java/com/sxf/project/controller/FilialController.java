@@ -4,8 +4,8 @@ package com.sxf.project.controller;
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.entity.Filial;
 import com.sxf.project.entity.User;
-import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.payload.ResourceNotFoundException;
+import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.FilialService;
 import jakarta.transaction.Transactional;
@@ -19,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -92,6 +91,7 @@ public class FilialController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @GetMapping("/export")
     public ResponseEntity<InputStreamResource> exportExcel() throws IOException {

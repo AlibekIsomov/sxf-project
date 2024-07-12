@@ -8,18 +8,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkerDTO {
-  private Long id;
+    private Long id;
 
-  private String name;
+    private String name;
 
-  private String surname;
+    private String surname;
 
-  private double currentSalary;
+    private double currentSalary;
 
-  private String jobDescription;
+    private String jobDescription;
 
-  private Long FileEntityId;
+    private Long FileEntityId;
 
-  private Long filialId;
+    private Long filialId;
 
 }

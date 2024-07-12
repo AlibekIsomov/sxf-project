@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ProfilePDRepository extends JpaRepository<ProfilePD,Long> {
+public interface ProfilePDRepository extends JpaRepository<ProfilePD, Long> {
 
     List<ProfilePD> findByFilialId(Long filialId);
 

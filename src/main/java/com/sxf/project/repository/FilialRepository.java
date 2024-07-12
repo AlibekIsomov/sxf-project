@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +17,6 @@ public interface FilialRepository extends JpaRepository<Filial, Long> {
     Page<Filial> findAllByNameContains(String name, Pageable pageable);
 
     List<Filial> findByCreatedAtBetween(Instant startDate, Instant endDate);
-
 
 
     @Query("SELECT f FROM Filial f LEFT JOIN FETCH f.managers WHERE f.id = :filialId")

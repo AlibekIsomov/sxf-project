@@ -92,7 +92,6 @@ public class MonthlySalaryPaymentServiceImpl implements MonthlySalaryPaymentServ
         monthlySalaryPayment.setMonthlySalary(monthlySalaryOptional.get());
 
 
-
         return Optional.of(monthlySalaryPaymentRepository.save(monthlySalaryPayment));
     }
 

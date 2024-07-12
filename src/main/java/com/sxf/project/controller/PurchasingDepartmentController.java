@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -38,13 +37,13 @@ public class PurchasingDepartmentController {
     @Transactional
     @GetMapping("/{id}")
     public ResponseEntity<PurchasingDepartment> getById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
-        return purchasingDepartmentService.getById(id,currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return purchasingDepartmentService.getById(id, currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<PurchasingDepartment> create(@RequestBody PurchasingDepartmentDTO data, @CurrentUser User currentUser) throws Exception {
         try {
-            Optional<PurchasingDepartment> purchasingDepartmentCreate = purchasingDepartmentService.create(data,currentUser);
+            Optional<PurchasingDepartment> purchasingDepartmentCreate = purchasingDepartmentService.create(data, currentUser);
 
             if (purchasingDepartmentCreate.isPresent()) {
                 return ResponseEntity.ok(purchasingDepartmentCreate.get());

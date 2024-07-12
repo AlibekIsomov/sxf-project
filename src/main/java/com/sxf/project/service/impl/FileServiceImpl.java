@@ -21,19 +21,19 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileEntity getById(Long id) {
-        return fileRepository.findById(id).orElseThrow(()->new RuntimeException("not found"));
+        return fileRepository.findById(id).orElseThrow(() -> new RuntimeException("not found"));
     }
 
     @Override
     public FileEntity create(FileEntity entity) {
-        if(entity.getId() == null)
-        return fileRepository.save(entity);
+        if (entity.getId() == null)
+            return fileRepository.save(entity);
         throw new RuntimeException("id must be null");
     }
 
     @Override
     public FileEntity update(FileEntity entity) {
-        if(entity.getId() != null)
+        if (entity.getId() != null)
             return fileRepository.save(entity);
         throw new RuntimeException("id must not be null");
     }

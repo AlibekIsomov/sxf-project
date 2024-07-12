@@ -25,10 +25,10 @@ public class ProfilePD {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name",unique=true, nullable=false , length=120)
+    @Column(name = "name", unique = true, nullable = false, length = 120)
     private String name;
 
-    @Column(name = "description", length=600)
+    @Column(name = "description", length = 600)
     private String description;
 
     @ManyToOne
@@ -40,7 +40,7 @@ public class ProfilePD {
     private FileEntity fileEntity;
 
     @CreatedBy
-    @Column(name = "created_by", nullable=false, updatable=false)
+    @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 
     @CreatedDate

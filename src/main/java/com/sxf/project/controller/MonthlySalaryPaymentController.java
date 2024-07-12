@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/monthlySalaryPayment")
-public class  MonthlySalaryPaymentController {
+public class MonthlySalaryPaymentController {
 
     @Autowired
     MonthlySalaryPaymentService monthlySalaryPaymentService;
@@ -60,6 +60,7 @@ public class  MonthlySalaryPaymentController {
     public void deleteById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
         monthlySalaryPaymentService.deletePayment(id, currentUser);
     }
+
     @GetMapping("/get/{monthlySalaryId}")
     public List<MonthlySalaryPayment> getMonthlySalariesByMonthlySalaryId(@PathVariable Long monthlySalaryId, @CurrentUser User currentUser) throws Exception {
         return monthlySalaryPaymentService.getMonthlySalariesByMonthlySalaryId(monthlySalaryId, currentUser);

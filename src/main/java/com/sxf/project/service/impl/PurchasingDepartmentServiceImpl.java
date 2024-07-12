@@ -5,14 +5,13 @@ import com.sxf.project.entity.*;
 import com.sxf.project.repository.ProfilePDRepository;
 import com.sxf.project.repository.PurchasingDepartmentRepository;
 import com.sxf.project.service.PurchasingDepartmentService;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -67,7 +66,6 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     public Optional<PurchasingDepartment> create(PurchasingDepartmentDTO data, User currentUser) throws Exception {
         try {
             Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
-
 
             Filial Filialcheck = optionalProfilePD.get().getFilial();
             Filial currentUserFilial = currentUser.getAssignedFilial();
@@ -159,12 +157,18 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
 
     @Override
     public Long getTotalFullAmountByProfilePD(Long profilePDId) {
-        return purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePDId);
+        ProfilePD profilePD = profilePDRepository.findById(profilePDId)
+                .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + profilePDId));
+
+        return purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePD.getId());
     }
 
     @Override
     public Long getRemainingPaymentByProfilePD(Long profilePDId) {
-        return purchasingDepartmentRepository.calculateRemainingPaymentByProfilePD(profilePDId);
+        ProfilePD profilePD = profilePDRepository.findById(profilePDId)
+                .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + profilePDId));
+
+        return purchasingDepartmentRepository.calculateRemainingPaymentByProfilePD(profilePD.getId());
     }
 
     @Override

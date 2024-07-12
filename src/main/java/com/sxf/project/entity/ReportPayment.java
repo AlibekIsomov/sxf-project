@@ -1,6 +1,7 @@
 package com.sxf.project.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,6 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
@@ -35,7 +35,7 @@ public class ReportPayment {
     private Report report;
 
     @CreatedBy
-    @Column(name = "created_by", nullable=false, updatable=false)
+    @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 
     @CreatedDate

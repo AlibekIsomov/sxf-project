@@ -9,7 +9,6 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 @Service
 public class WorkerServiceImpl implements WorkerService {
 
@@ -125,9 +125,6 @@ public class WorkerServiceImpl implements WorkerService {
 
         }
 
-
-
-
     @Override
     public Optional<Worker> update(Long id, WorkerDTO data, User currentUser) throws Exception {
         Optional<Worker> optionalWorker = workerRepository.findById(id);
@@ -149,8 +146,10 @@ public class WorkerServiceImpl implements WorkerService {
         }
 
         if (optionalWorker.isPresent()) {
+            logger.info("Report with id " + id + " does not exist");
+            return Optional.empty();
+        }
             Worker worker = optionalWorker.get();
-
             FileEntity oldFileEntity = worker.getFileEntity();
             if (data.getFileEntityId() != null) {
                 Optional<FileEntity> newFileEntityOptional = fileRepository.findById(data.getFileEntityId());
@@ -172,13 +171,9 @@ public class WorkerServiceImpl implements WorkerService {
             worker.setSurname(data.getSurname());
             worker.setJobDescription(data.getJobDescription());
 
-            // Save the updated worker
             return Optional.of(workerRepository.save(worker));
-        } else {
-            // Handle the case where the worker with the given ID doesn't exist
-            throw new ChangeSetPersister.NotFoundException();
-        }
     }
+
     @Override
     public Page<Worker> getAllByNameAndSurnameContains(String name,String surname, Pageable pageable) {
         return workerRepository.findAllByNameAndSurnameContains(name, surname, pageable);

@@ -29,16 +29,16 @@ public class Filial {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name",unique=true, nullable=false , length=120)
+    @Column(name = "name", unique = true, nullable = false, length = 120)
     private String name;
 
-    @Column(name = "description", length=600)
+    @Column(name = "description", length = 600)
     private String description;
 
-    @Column(name = "location", length=600)
+    @Column(name = "location", length = 600)
     private String location;
 
-    @Column(name = "sales_department", length=600)
+    @Column(name = "sales_department", length = 600)
     private long salesDepartment;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -55,7 +55,7 @@ public class Filial {
     private User user;
 
     @CreatedBy
-    @Column(name = "created_by", nullable=false, updatable=false)
+    @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 
     @CreatedDate

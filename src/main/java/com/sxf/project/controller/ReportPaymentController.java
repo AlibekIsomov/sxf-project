@@ -10,10 +10,10 @@ import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/reportPayment")
 public class ReportPaymentController {
@@ -32,7 +32,7 @@ public class ReportPaymentController {
 
     @GetMapping("/release/{reportId}")
     public ResponseEntity<Double> releasePaidAmount(
-            @PathVariable Long reportId ) throws NotFoundException {
+            @PathVariable Long reportId) throws NotFoundException {
         double remainingAmount = paymentService.remainingPaidAmount(reportId);
         return ResponseEntity.ok(remainingAmount);
     }

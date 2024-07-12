@@ -1,4 +1,5 @@
 package com.sxf.project.repository;
+
 import com.sxf.project.entity.MonthlySalaryPayment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
