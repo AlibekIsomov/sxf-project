@@ -163,18 +163,25 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
 
     @Override
     public Long getTotalFullAmountByProfilePD(Long profilePDId) {
-        ProfilePD profilePD = profilePDRepository.findById(profilePDId)
+        PurchasingDepartment purchasingDepartment = purchasingDepartmentRepository.findById(profilePDId)
                 .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + profilePDId));
 
-        return purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePDId);
+        ProfilePD profilePD = purchasingDepartment.getProfilePD();
+
+        return purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePD);
     }
 
     @Override
     public Long getRemainingPaymentByProfilePD(Long profilePDId) {
-        ProfilePD profilePD = profilePDRepository.findById(profilePDId)
-                .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + profilePDId));
+        PurchasingDepartment purchasingDepartment = purchasingDepartmentRepository.findById(profilePDId)
+                .orElseThrow(() -> new EntityNotFoundException("Report not found for id: " + profilePDId));
 
-        return purchasingDepartmentRepository.calculateRemainingPaymentByProfilePD(profilePDId);
+        ProfilePD profilePD  = purchasingDepartment.getProfilePD();
+
+        Long totalAmount = purchasingDepartment.getFullAmount();
+        Long paidAmount = purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePD);
+
+        return totalAmount - paidAmount;
     }
 
     @Override
