@@ -1,5 +1,6 @@
 package com.sxf.project.repository;
 
+import com.sxf.project.entity.Report;
 import com.sxf.project.entity.ReportPayment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ReportPaymentRepository extends JpaRepository<ReportPayment, Long> {
     @Query("SELECT COALESCE(SUM(p.newPayment), 0) FROM ReportPayment p WHERE p.report = :report")
-    Long calculateTotalPaymentsByReport(@Param("report") Long reportId);
+    Long calculateTotalPaymentsByReport(@Param("report") Report report);
 
 //    List<ReportPayment> findByFilialId(Long filialId);
 
@@ -19,5 +20,5 @@ public interface ReportPaymentRepository extends JpaRepository<ReportPayment, Lo
     List<ReportPayment> findByFilialId(@Param("filialId") Long filialId);
 
     @Query("SELECT rp.newPayment - SUM(r.number * r.price) FROM ReportPayment rp JOIN rp.report r WHERE r.id = :reportId GROUP BY r.id")
-    Long calculateRemainingPaymentByReport(@Param("reportId") Long reportId);
+    Long calculateRemainingPaymentByReport(@Param("report") Report reportId);
 }

@@ -120,20 +120,19 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
         }
     }
 
-        @Override
-        public double calculateTotalPaymentsByReport(Long reportId){
-            Report report = reportRepository.findById(reportId)
-                    .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
+    @Override
+    public double calculateTotalPaymentsByReport(Long reportId){
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
 
-            return paymentRepository.calculateTotalPaymentsByReport(reportId);
-        }
+        return paymentRepository.calculateTotalPaymentsByReport(report);
+    }
 
         @Override
         public double remainingPaidAmount(Long reportId) {
             Report report = reportRepository.findById(reportId)
                     .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
-
-            return paymentRepository.calculateRemainingPaymentByReport(reportId);
+            return paymentRepository.calculateRemainingPaymentByReport(report);
 
         }
     @Override
