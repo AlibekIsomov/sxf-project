@@ -133,7 +133,6 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
             Report report = reportRepository.findById(reportId)
                     .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
             return paymentRepository.calculateRemainingPaymentByReport(report);
-
         }
     @Override
     public void deletePayment(Long paymentId, User currentUser) {

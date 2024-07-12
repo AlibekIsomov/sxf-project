@@ -31,8 +31,7 @@ public class ReportPaymentController {
     }
 
     @GetMapping("/release/{reportId}")
-    public ResponseEntity<Double> releasePaidAmount(
-            @PathVariable Long reportId) throws NotFoundException {
+    public ResponseEntity<Double> releasePaidAmount(@PathVariable Long reportId) throws NotFoundException {
         double remainingAmount = paymentService.remainingPaidAmount(reportId);
         return ResponseEntity.ok(remainingAmount);
     }
