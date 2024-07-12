@@ -19,6 +19,6 @@ public interface ReportPaymentRepository extends JpaRepository<ReportPayment, Lo
     @Query("SELECT msp FROM ReportPayment msp JOIN msp.report w WHERE w.filial.id = :filialId")
     List<ReportPayment> findByFilialId(@Param("filialId") Long filialId);
 
-    @Query("SELECT rp.newPayment - SUM(r.number * r.price) FROM ReportPayment rp JOIN rp.report r WHERE r.id = :reportId GROUP BY r.id")
-    Long calculateRemainingPaymentByReport(@Param("report") Report reportId);
+    @Query("SELECT rp.newPayment - SUM(r.number * r.price) FROM ReportPayment rp JOIN rp.report r WHERE  rp.report = :report")
+    Long calculateRemainingPaymentByReport(@Param("report") Report report);
 }
