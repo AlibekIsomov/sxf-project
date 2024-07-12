@@ -42,7 +42,10 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     @Override
     public Optional<PurchasingDepartment> getById(Long id, User currentUser) throws Exception {
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
-
+        if(!purchasingDepartmentRepository.existsById(id)) {
+            logger.info("ProfilePD with id " + id + " does not exists");
+            return Optional.empty();
+        }
         if (!optionalProfilePD.isPresent()) {
             logger.info("Such ID filial does not exist!");
             return Optional.empty();
@@ -61,10 +64,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 
-        if(!purchasingDepartmentRepository.existsById(id)) {
-            logger.info("ProfilePD with id " + id + " does not exists");
-            return Optional.empty();
-        }
+
         return purchasingDepartmentRepository.findById(id);
     }
 
@@ -113,16 +113,13 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         }
     }
 
-    @Override
     public Optional<PurchasingDepartment> update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception {
         Optional<PurchasingDepartment> optionalPurchasingDepartmentUpdate = purchasingDepartmentRepository.findById(id);
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
 
         if (!optionalProfilePD.isPresent()) {
             logger.info("Such ID filial does not exist!");
-
-           return Optional.empty();
-
+            return Optional.empty();
         }
 
         Filial Filialcheck = optionalProfilePD.get().getFilial();
@@ -131,22 +128,24 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         // Check if the current user is not assigned to a filial and is not an admin
         if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
             logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return Optional.empty();
         }
 
         // If the current user has an assigned filial, check if it matches the worker's filial
         if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
+            return Optional.empty();
         }
 
         if (optionalPurchasingDepartmentUpdate.isPresent()) {
-
             PurchasingDepartment PurchasingDepartmentUpdate = optionalPurchasingDepartmentUpdate.get();
 
             PurchasingDepartmentUpdate.setName(data.getName());
             PurchasingDepartmentUpdate.setPrice(data.getPrice());
             PurchasingDepartmentUpdate.setNumber(data.getNumber());
             PurchasingDepartmentUpdate.setPayment(data.getPayment());
-
+            PurchasingDepartmentUpdate.setDescription(data.getDescription());
+            
             PurchasingDepartmentUpdate.setProfilePD(optionalProfilePD.get());
 
             // Save the updated
