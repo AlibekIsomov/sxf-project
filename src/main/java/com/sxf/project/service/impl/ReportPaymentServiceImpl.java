@@ -134,7 +134,7 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
         Report report = paymentRepository.findById(reportId)
                 .orElseThrow(() ->  new EntityNotFoundException("Report not found for id: " + reportId)).getReport();
 
-        double totalAmount = report.getPrice();
+        double totalAmount = report.getFullAmount();
         double paidAmount = paymentRepository.calculateTotalPaymentsByReport(report);
 
         return totalAmount - paidAmount;
