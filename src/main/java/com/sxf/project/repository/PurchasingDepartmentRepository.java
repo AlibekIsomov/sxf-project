@@ -22,5 +22,7 @@ public interface PurchasingDepartmentRepository extends JpaRepository<Purchasing
 
     @Query("SELECT msp FROM PurchasingDepartment msp JOIN msp.profilePD  w WHERE w.filial.id = :filialId")
     List<PurchasingDepartment> findByFilialId(@Param("filialId") Long filialId);
+
+    List<PurchasingDepartment> findAllByProfilePDId(Long id);
 }
 

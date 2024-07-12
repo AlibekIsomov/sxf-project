@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -45,15 +46,17 @@ public class ProfilePDController {
         return profilePDService.getById(id, currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     @GetMapping("/filial/{id}")
-    public ResponseEntity<?> getWorkersByFilial(@PathVariable Long id) {
+    public ResponseEntity<?> getProfilePDByFilial(@PathVariable Long id) {
         List<ProfilePD> profilePDS = profilePDService.getAllByFilial(id);
         if (profilePDS.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
         }
         return ResponseEntity.ok(profilePDS);
     }
-
+    @Transactional
     @GetMapping("/filial")
     public ResponseEntity<?> getWorkersByFilial(@CurrentUser User currentUser) {
         List<ProfilePD> profilePDS = profilePDService.getProfilePDByFilial(currentUser);
@@ -64,6 +67,7 @@ public class ProfilePDController {
         return ResponseEntity.ok(profilePDS);
     }
 
+    @Transactional
     @PostMapping
     public ResponseEntity<ProfilePD> create(@RequestBody ProfilePDDTO data, @CurrentUser User currentUser) throws Exception {
         try {
@@ -79,6 +83,7 @@ public class ProfilePDController {
         }
     }
 
+    @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<ProfilePD> update(@PathVariable Long id, @RequestBody ProfilePDDTO data, @CurrentUser User currentUser) {
         try {
@@ -95,7 +100,7 @@ public class ProfilePDController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    @Transactional
     @GetMapping("/export/{filialId}")
     public ResponseEntity<InputStreamResource> exportExcel(@PathVariable Long filialId) throws IOException {
         ByteArrayInputStream in = profilePDService.getByFilialIdExportExcel(filialId);
@@ -108,7 +113,7 @@ public class ProfilePDController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(new InputStreamResource(in));
     }
-
+    @Transactional
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id, @CurrentUser User currentUser) {
         profilePDService.deleteById(id, currentUser);

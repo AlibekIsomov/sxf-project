@@ -40,6 +40,7 @@ public class ReportController {
         return reportService.getById(id, currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @Transactional
     @PostMapping
     public ResponseEntity<Report> create(@RequestBody ReportDTO data, @CurrentUser User currentUser) throws Exception {
         try {

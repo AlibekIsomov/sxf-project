@@ -34,6 +34,7 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
     @Override
     public ResponseEntity<ReportPayment> addPayment(Long reportId, Long newPayment, User currentUser) {
         Optional<Report> reportOptional = reportRepository.findById(reportId);
+
         Report report = reportOptional.get();
 
         Filial Filialcheck = report.getFilial();
@@ -124,7 +125,7 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
             Report report = reportRepository.findById(reportId)
                     .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
 
-            return paymentRepository.calculateTotalPaymentsByReport(report.getId());
+            return paymentRepository.calculateTotalPaymentsByReport(reportId);
         }
 
         @Override
@@ -132,7 +133,7 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
             Report report = reportRepository.findById(reportId)
                     .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
 
-            return paymentRepository.calculateRemainingPaymentByReport(report.getId());
+            return paymentRepository.calculateRemainingPaymentByReport(reportId);
 
         }
     @Override

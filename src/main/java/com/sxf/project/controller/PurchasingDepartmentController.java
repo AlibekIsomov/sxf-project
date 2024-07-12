@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -39,7 +40,7 @@ public class PurchasingDepartmentController {
     public ResponseEntity<PurchasingDepartment> getById(@PathVariable Long id, @CurrentUser User currentUser) throws Exception {
         return purchasingDepartmentService.getById(id, currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    @Transactional
     @PostMapping
     public ResponseEntity<PurchasingDepartment> create(@RequestBody PurchasingDepartmentDTO data, @CurrentUser User currentUser) throws Exception {
         try {
@@ -91,6 +92,15 @@ public class PurchasingDepartmentController {
     public void deleteById(@PathVariable Long id,
                            @CurrentUser User currentUser) throws Exception {
         purchasingDepartmentService.deleteById(id, currentUser);
+    }
+
+    @GetMapping("/profilePD/{id}")
+    public ResponseEntity<?> getProfilePDByFilial(@PathVariable Long id) {
+        List<PurchasingDepartment> purchasingDepartments = purchasingDepartmentService.getAllByProfileDBId(id);
+        if (purchasingDepartments.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
+        }
+        return ResponseEntity.ok(purchasingDepartments);
     }
 
 }

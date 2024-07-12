@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,11 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     @Override
     public Page<PurchasingDepartment> getAll(Pageable pageable) throws Exception {
         return purchasingDepartmentRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<PurchasingDepartment> getAllByProfileDBId(Long id) {
+        return purchasingDepartmentRepository.findAllByProfilePDId(id);
     }
 
     @Override
@@ -160,7 +166,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         ProfilePD profilePD = profilePDRepository.findById(profilePDId)
                 .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + profilePDId));
 
-        return purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePD.getId());
+        return purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePDId);
     }
 
     @Override
@@ -168,7 +174,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         ProfilePD profilePD = profilePDRepository.findById(profilePDId)
                 .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + profilePDId));
 
-        return purchasingDepartmentRepository.calculateRemainingPaymentByProfilePD(profilePD.getId());
+        return purchasingDepartmentRepository.calculateRemainingPaymentByProfilePD(profilePDId);
     }
 
     @Override

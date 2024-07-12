@@ -43,7 +43,7 @@ public class FilialController {
         return ResponseEntity.ok(filialService.getAll(pageable));
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Transactional
     @GetMapping("/{id}")
     public ResponseEntity<Filial> getById(@PathVariable Long id) throws Exception {

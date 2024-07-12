@@ -13,7 +13,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 @Service
 public class ProfilePDServiceImpl implements ProfilePDService {
@@ -43,7 +41,6 @@ public class ProfilePDServiceImpl implements ProfilePDService {
 
     @Autowired
     FilialRepository filialRepository;
-
 
     @Override
     public Page<ProfilePD> getAll(Pageable pageable) throws Exception {
@@ -68,35 +65,32 @@ public class ProfilePDServiceImpl implements ProfilePDService {
 
     @Override
     public Optional<ProfilePD> getById(Long id, User currentUser) throws Exception {
-
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
-        if (optionalProfilePD.isPresent()) {
-            logger.info("Such ID filial does not exist!");
+
+        if (!optionalProfilePD.isPresent()) {
+            logger.info("Such ID Profile does not exist!");
             return Optional.empty();
         }
-        Filial workerFilial = optionalProfilePD.get().getFilial();
+
+        ProfilePD profilePD = optionalProfilePD.get();
+
+        Filial workerFilial = profilePD.getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
-        // Check if the current user is not assigned to a filial and is not an admin
         if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
             logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
             return Optional.empty();
         }
 
-        // If the current user has an assigned filial, check if it matches the worker's filial
         if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
             return Optional.empty();
         }
-
-
         return profilePDRepository.findById(id);
     }
 
     @Override
     public Optional<ProfilePD> create(ProfilePDDTO data, User currentUser) throws Exception {
-
-
         Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
         if (!optionalFilial.isPresent()) {
