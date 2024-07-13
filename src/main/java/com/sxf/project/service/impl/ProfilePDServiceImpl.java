@@ -77,12 +77,12 @@ public class ProfilePDServiceImpl implements ProfilePDService {
         Filial workerFilial = profilePD.getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
-        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+        if (currentUserFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
             logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
             return Optional.empty();
         }
 
-        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
             return Optional.empty();
         }
@@ -101,7 +101,7 @@ public class ProfilePDServiceImpl implements ProfilePDService {
 
         Filial assignedFilial = currentUser.getAssignedFilial();
         if (assignedFilial == null) {
-            if (!currentUser.getRoles().contains(Role.ADMIN)) {
+            if (!currentUser.getRoles().equals(Role.ADMIN)) {
                 logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
                 return Optional.empty();
             }
@@ -147,7 +147,7 @@ public class ProfilePDServiceImpl implements ProfilePDService {
             Filial checkFilial = optionalFilial.get();
             Filial assignedFilial = currentUser.getAssignedFilial();
             if (assignedFilial == null) {
-                if (!currentUser.getRoles().contains(Role.ADMIN)) {
+                if (!currentUser.getRoles().equals(Role.ADMIN)) {
                     logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
                     return Optional.empty();
                 }
@@ -188,12 +188,12 @@ public class ProfilePDServiceImpl implements ProfilePDService {
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
         // Check if the current user is not assigned to a filial and is not an admin
-        if (currentUserFilial == null && !currentUser.getRoles().contains(Role.ADMIN)) {
+        if (currentUserFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
             logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
         }
 
         // If the current user has an assigned filial, check if it matches the worker's filial
-        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().contains(Role.ADMIN)) {
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
         }
 

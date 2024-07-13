@@ -86,7 +86,7 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
     @Override
     public void someChangesForCreate(User entity) {
         entity.setPassword(encoder.encode(entity.getPassword()));
-        entity.setRoles(Set.of(Role.USER));
+        entity.setRoles(Role.USER);
         entity.setActive(true);
     }
 

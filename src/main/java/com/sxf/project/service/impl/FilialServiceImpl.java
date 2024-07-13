@@ -168,11 +168,11 @@ public class FilialServiceImpl implements FilialService {
     public Filial getFilialForUser(Long filialId, Long userId) throws AccessDeniedException {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (user.getRoles().contains(Role.ADMIN)) {
+        if (user.getRoles().equals(Role.ADMIN)) {
             return filialRepository.findById(filialId).orElseThrow(() -> new ResourceNotFoundException("Filial not found"));
         }
 
-        if (user.getRoles().contains(Role.MANAGER) && user.getAssignedFilial() != null && user.getAssignedFilial().getId().equals(filialId)) {
+        if (user.getRoles().equals(Role.MANAGER) && user.getAssignedFilial() != null && user.getAssignedFilial().getId().equals(filialId)) {
             return user.getAssignedFilial();
         }
 
@@ -183,7 +183,7 @@ public class FilialServiceImpl implements FilialService {
     public List<Filial> getAllFilialsForAdmin(Long adminId) throws AccessDeniedException {
         User admin = userRepository.findById(adminId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (!admin.getRoles().contains(Role.ADMIN)) {
+        if (!admin.getRoles().equals(Role.ADMIN)) {
             throw new AccessDeniedException("Access is denied");
         }
 
@@ -199,7 +199,7 @@ public class FilialServiceImpl implements FilialService {
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (!manager.getRoles().contains(Role.MANAGER)) {
+        if (!manager.getRoles().equals(Role.MANAGER)) {
             throw new AccessDeniedException("Access is denied");
         }
 
@@ -224,7 +224,7 @@ public class FilialServiceImpl implements FilialService {
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (!manager.getRoles().contains(Role.MANAGER)) {
+        if (!manager.getRoles().equals(Role.MANAGER)) {
             throw new AccessDeniedException("Access is denied");
         }
 

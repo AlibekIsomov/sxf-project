@@ -4,15 +4,13 @@ package com.sxf.project.dto;
 import com.sxf.project.entity.Role;
 import com.sxf.project.entity.User;
 
-import java.util.Set;
-
 public class UserDTO extends BaseDTO {
 
     private String name;
     private String surname;
     private String username;
     private String phoneNumber;
-    private Set<Role> roles;
+    private Role roles;
     private Boolean active;
 
     private Long assignedFilialId;
@@ -76,11 +74,11 @@ public class UserDTO extends BaseDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    public Set<Role> getRoles() {
+    public Role getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Role roles) {
         this.roles = roles;
     }
 

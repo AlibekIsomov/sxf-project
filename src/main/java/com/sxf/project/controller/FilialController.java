@@ -112,7 +112,7 @@ public class FilialController {
         filialService.deleteById(id);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{filialId}/assign-manager/{managerId}")
     public ResponseEntity<FilialDTO> assignFilialToManager(@PathVariable Long filialId, @PathVariable Long managerId) {
         try {

@@ -2,7 +2,6 @@ package com.sxf.project.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Set;
+import java.util.Collections;
 
 @Entity
 @Table(name = "userser")
@@ -45,11 +44,7 @@ public class User extends DistributedEntity  implements UserDetails, Serializabl
 
     private String phoneNumber;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role_id")
-    private Set<Role> roles;
+    private Role roles;
 
     private Boolean active;
 
@@ -58,7 +53,7 @@ public class User extends DistributedEntity  implements UserDetails, Serializabl
     @JsonBackReference
     private Filial assignedFilial;
 
-    public User(String name, String surname, String phoneNumber, String username, Set<Role> roles, Filial assignedFilial) {
+    public User(String name, String surname, String phoneNumber, String username, Role roles, Filial assignedFilial) {
         this.name = name;
         this.surname = surname;
         this.username = username;
@@ -71,7 +66,7 @@ public class User extends DistributedEntity  implements UserDetails, Serializabl
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        return Collections.singleton(roles);
     }
 
     @Override

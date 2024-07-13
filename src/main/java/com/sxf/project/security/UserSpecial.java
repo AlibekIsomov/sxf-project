@@ -1,6 +1,7 @@
 package com.sxf.project.security;
 
 
+import com.sxf.project.entity.Role;
 import com.sxf.project.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,7 +18,7 @@ public class UserSpecial implements UserDetails, Serializable {
 
     private String username;
     private String password;
-    private Set<SimpleGrantedAuthority> roles;
+    private Role roles;
     private Boolean active;
 
     public UserSpecial(){}
@@ -25,17 +27,13 @@ public class UserSpecial implements UserDetails, Serializable {
         this.username = user.getUsername();
         this.password = user.getPassword();
 
-        this.roles =
-                user.getRoles()
-                        .stream()
-                        .map(l->new SimpleGrantedAuthority(l.name()))
-                        .collect(Collectors.toSet());
+        this.roles =user.getRoles();
         this.active = user.getActive();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        return Collections.singleton(roles);
     }
 
     @Override

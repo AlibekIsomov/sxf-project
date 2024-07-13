@@ -10,6 +10,12 @@ public interface PaymentStatisticService {
 
     List<PaymentStatisticDTO> getPaymentsByFilialId(Long filialId);
 
+    List<PaymentStatisticDTO> getPayments();
+
+    PaymentStatisticsResponseDTO getAllIncome();
+
+    PaymentStatisticsResponseDTO getAllOutcome();
+
     PaymentStatisticsResponseDTO getIncomeByFilialId(Long filialId);
 
     PaymentStatisticsResponseDTO getOutcomeByFilialId(Long filialId);

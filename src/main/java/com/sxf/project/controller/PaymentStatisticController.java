@@ -41,4 +41,20 @@ public class PaymentStatisticController {
         PaymentStatisticsResponseDTO outcome = paymentService.getOutcomeByFilialId(filialId);
         return ResponseEntity.ok(outcome);
     }
+
+
+    @GetMapping
+    public List<PaymentStatisticDTO> getPayments() {
+        return paymentService.getPayments();
+    }
+
+    @GetMapping("/income")
+    public PaymentStatisticsResponseDTO getAllIncome() {
+        return paymentService.getAllIncome();
+    }
+
+    @GetMapping("/outcome")
+    public PaymentStatisticsResponseDTO getAllOutcome() {
+        return paymentService.getAllOutcome();
+    }
 }

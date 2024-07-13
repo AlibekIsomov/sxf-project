@@ -31,7 +31,7 @@ public class AdminUserInitializer implements CommandLineRunner {
             u.setUsername("admin123");
             u.setPassword(passwordEncoder.encode("admin123"));
             u.setActive(true);
-            u.setRoles(Set.of(Role.ADMIN));
+            u.setRoles(Role.ADMIN);
             userRepository.save(u);
         }
 
