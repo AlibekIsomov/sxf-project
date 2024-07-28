@@ -3,6 +3,7 @@ package com.sxf.project.service.impl;
 import com.sxf.project.dto.MonthlySalaryDTO;
 import com.sxf.project.dto.WorkerDTO;
 import com.sxf.project.entity.*;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.*;
 import com.sxf.project.service.WorkerService;
 import jakarta.transaction.Transactional;
@@ -79,7 +80,7 @@ public class WorkerServiceImpl implements WorkerService {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
             return Optional.empty();
         }
-        if(!workerRepository.existsById(id)) {
+        if (!workerRepository.existsById(id)) {
             logger.info("Input with id " + id + " does not exists");
         }
         if (!optionalWorker.isPresent()) {
@@ -90,92 +91,88 @@ public class WorkerServiceImpl implements WorkerService {
 
 
     @Override
-    public Optional<Worker> create(WorkerDTO data, User currentUser) throws Exception {
+    public ApiResponse create(WorkerDTO data, User currentUser) throws Exception {
         Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
-        // Check if the Filial exists
         if (!optionalFilial.isPresent()) {
             logger.info("Such ID filial does not exist!");
-            return Optional.empty();
-
+            return new ApiResponse("Such ID filial does not exist!", false);
         }
+
         Filial checkFilial = optionalFilial.get();
-
         Filial assignedFilial = currentUser.getAssignedFilial();
-        if (assignedFilial == null) {
-            if (!currentUser.getRoles().equals(Role.ADMIN)) {
-                logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-                return Optional.empty();
-            }
-        } else {
-            // If the current user has an assigned filial, check if it matches the checkFilial
-            if (!assignedFilial.getId().equals(checkFilial.getId())) {
-                logger.info("Restricted: User's assigned filial does not match the checkFilial");
-                return Optional.empty();
-            }
-        }
-            // Create a new Worker
-            Worker worker = new Worker();
-            worker.setName(data.getName());
-            worker.setSurname(data.getSurname());
-            worker.setJobDescription(data.getJobDescription());
-            worker.setFilial(optionalFilial.get());
 
-            return Optional.of(workerRepository.save(worker));
-
+        if (assignedFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return new ApiResponse("Restricted: User does not have an assigned filial and is not an ADMIN", false);
         }
+
+        if (assignedFilial != null && !assignedFilial.getId().equals(checkFilial.getId())) {
+            logger.info("Restricted: User's assigned filial does not match the checkFilial");
+            return new ApiResponse("Restricted: User's assigned filial does not match the checkFilial", false);
+        }
+
+        Worker worker = new Worker();
+        worker.setName(data.getName());
+        worker.setSurname(data.getSurname());
+        worker.setJobDescription(data.getJobDescription());
+        worker.setFilial(checkFilial);
+
+        Worker savedWorker = workerRepository.save(worker);
+        return new ApiResponse("Worker created successfully", true, savedWorker);
+    }
 
     @Override
-    public Optional<Worker> update(Long id, WorkerDTO data, User currentUser) throws Exception {
+    public ApiResponse update(Long id, WorkerDTO data, User currentUser) throws Exception {
         Optional<Worker> optionalWorker = workerRepository.findById(id);
+
+        if (!optionalWorker.isPresent()) {
+            logger.info("Worker with id " + id + " does not exist");
+            return new ApiResponse("Worker with id " + id + " does not exist", false);
+        }
 
         Worker checkWorker = optionalWorker.get();
         Filial workerFilial = checkWorker.getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
-        // Check if the current user is not assigned to a filial and is not an admin
         if (currentUserFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
             logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-            return Optional.empty();
+            return new ApiResponse("Restricted: User does not have an assigned filial and is not an ADMIN", false);
         }
 
-        // If the current user has an assigned filial, check if it matches the worker's filial
-        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId())) {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
-            return Optional.empty();
+            return new ApiResponse("Restricted: User's assigned filial does not match the worker's filial", false);
         }
 
-        if (optionalWorker.isPresent()) {
-            logger.info("Report with id " + id + " does not exist");
-            return Optional.empty();
-        }
-            Worker worker = optionalWorker.get();
-            FileEntity oldFileEntity = worker.getFileEntity();
-            if (data.getFileEntityId() != null) {
-                Optional<FileEntity> newFileEntityOptional = fileRepository.findById(data.getFileEntityId());
+        Worker workerToUpdate = optionalWorker.get();
+        FileEntity oldFileEntity = workerToUpdate.getFileEntity();
 
-                if (!newFileEntityOptional.isPresent()) {
-                    logger.info("FileEntity with id " + data.getFileEntityId() + " does not exist");
-                    return Optional.empty();
-                }
+        if (data.getFileEntityId() != null) {
+            Optional<FileEntity> newFileEntityOptional = fileRepository.findById(data.getFileEntityId());
 
-                FileEntity newFileEntity = newFileEntityOptional.get();
-                worker.setFileEntity(newFileEntity);
-            } else {
-                if (oldFileEntity != null) {
-                    fileRepository.delete(oldFileEntity);
-                    worker.setFileEntity(null);
-                }
+            if (!newFileEntityOptional.isPresent()) {
+                logger.info("FileEntity with id " + data.getFileEntityId() + " does not exist");
+                return new ApiResponse("FileEntity with id " + data.getFileEntityId() + " does not exist", false);
             }
-            worker.setName(data.getName());
-            worker.setSurname(data.getSurname());
-            worker.setJobDescription(data.getJobDescription());
 
-            return Optional.of(workerRepository.save(worker));
+            FileEntity newFileEntity = newFileEntityOptional.get();
+            workerToUpdate.setFileEntity(newFileEntity);
+        } else if (oldFileEntity != null) {
+            fileRepository.delete(oldFileEntity);
+            workerToUpdate.setFileEntity(null);
+        }
+
+        workerToUpdate.setName(data.getName());
+        workerToUpdate.setSurname(data.getSurname());
+        workerToUpdate.setJobDescription(data.getJobDescription());
+
+        Worker updatedWorker = workerRepository.save(workerToUpdate);
+        return new ApiResponse("Worker updated successfully", true, updatedWorker);
     }
 
     @Override
-    public Page<Worker> getAllByNameAndSurnameContains(String name,String surname, Pageable pageable) {
+    public Page<Worker> getAllByNameAndSurnameContains(String name, String surname, Pageable pageable) {
         return workerRepository.findAllByNameAndSurnameContains(name, surname, pageable);
     }
 
@@ -197,7 +194,7 @@ public class WorkerServiceImpl implements WorkerService {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
             return Optional.empty();
         }
-        if(!workerRepository.existsById(id)) {
+        if (!workerRepository.existsById(id)) {
             logger.info("Input with id " + id + " does not exists");
         }
 

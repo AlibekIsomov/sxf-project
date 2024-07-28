@@ -3,10 +3,8 @@ package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.dto.UserDTO;
-import com.sxf.project.entity.FileEntity;
-import com.sxf.project.entity.Filial;
-import com.sxf.project.entity.Role;
-import com.sxf.project.entity.User;
+import com.sxf.project.entity.*;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.FileRepository;
 import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.repository.UserRepository;
@@ -72,52 +70,55 @@ public class FilialServiceImpl implements FilialService {
     }
 
     @Override
-    public Optional<Filial> create(FilialDTO data) throws Exception {
-
+    public ApiResponse create(FilialDTO data) throws Exception {
         Filial filial = new Filial();
         filial.setName(data.getName());
         filial.setDescription(data.getDescription());
         filial.setLocation(data.getLocation());
         filial.setSalesDepartment(data.getSalesDepartment());
 
-
-        return Optional.of(filialRepository.save(filial));
+        Filial savedFilial = filialRepository.save(filial);
+        return new ApiResponse("Filial muvaffaqiyatli yaratildi!", true, savedFilial);
     }
 
     @Override
-    public Optional<Filial> update(Long id, FilialDTO data) throws Exception {
-        Optional<Filial> existingFilial = filialRepository.findById(id);
+    public ApiResponse update(Long id, FilialDTO data) throws Exception {
+        Optional<Filial> existingFilialOptional = filialRepository.findById(id);
 
-        Filial filialUpdate = existingFilial.get();
-
-        FileEntity oldFileEntity = filialUpdate.getFileEntity();
-
-        if (data.getFileEntityId() != null) {
-            Optional<FileEntity> newFileEntityOptional = fileRepository.findById(data.getFileEntityId());
-
-            if (!newFileEntityOptional.isPresent()) {
-                logger.info("FileEntity with id " + data.getFileEntityId() + " does not exist");
-                return Optional.empty();
-            }
-
-            FileEntity newFileEntity = newFileEntityOptional.get();
-            filialUpdate.setFileEntity(newFileEntity);
-        } else {
-            if (oldFileEntity != null) {
-                // Delete the old FileEntity from the repository
-                fileRepository.delete(oldFileEntity);
-                // Remove the old FileEntity from the Store
-                filialUpdate.setFileEntity(null);
-            }
+        if (existingFilialOptional.isEmpty()) {
+            logger.info("Filial with ID {} does not exist!", id);
+            return new ApiResponse("Bunaqa Idlik filial yo'q!", false);
         }
+
+        Filial filialUpdate = existingFilialOptional.get();
+        updateFileEntity(data, filialUpdate);
 
         filialUpdate.setName(data.getName());
         filialUpdate.setDescription(data.getDescription());
         filialUpdate.setLocation(data.getLocation());
         filialUpdate.setSalesDepartment(data.getSalesDepartment());
 
-        return Optional.of(filialRepository.save(filialUpdate));
+        Filial updatedFilial = filialRepository.save(filialUpdate);
+        return new ApiResponse("Filial muvaffaqiyatli yangilandi!", true, updatedFilial);
     }
+
+    private void updateFileEntity(FilialDTO data, Filial profileCD) {
+        FileEntity oldFileEntity = profileCD.getFileEntity();
+
+        if (data.getFileEntityId() != null) {
+            Optional<FileEntity> newFileEntityOptional = fileRepository.findById(data.getFileEntityId());
+
+            if (newFileEntityOptional.isPresent()) {
+                profileCD.setFileEntity(newFileEntityOptional.get());
+            } else {
+                logger.info("FileEntity with ID {} does not exist!", data.getFileEntityId());
+            }
+        } else if (oldFileEntity != null) {
+            fileRepository.delete(oldFileEntity);
+            profileCD.setFileEntity(null);
+        }
+    }
+
 
     @Override
     public Page<Filial> getAllByNameContains(String name, Pageable pageable) {
@@ -193,7 +194,7 @@ public class FilialServiceImpl implements FilialService {
 
     @Override
     @Transactional
-    public FilialDTO assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException {
+    public FilialDTO    assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException {
         Filial filial = filialRepository.findByIdWithManagers(filialId)
                 .orElseThrow(() -> new ResourceNotFoundException("Filial not found"));
         User manager = userRepository.findById(managerId)

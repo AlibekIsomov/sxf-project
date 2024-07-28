@@ -4,6 +4,7 @@ import com.sxf.project.dto.PurchasingDepartmentDTO;
 import com.sxf.project.entity.ProfilePD;
 import com.sxf.project.entity.PurchasingDepartment;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,9 +18,10 @@ public interface PurchasingDepartmentService {
 
     Optional<PurchasingDepartment> getById(Long id, User currentUser) throws Exception;
 
-    Optional<PurchasingDepartment> create(PurchasingDepartmentDTO data, User currentUser) throws Exception;
 
-    Optional<PurchasingDepartment> update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception;
+    ApiResponse create(PurchasingDepartmentDTO data, User currentUser) throws Exception;
+
+    ApiResponse update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception;
 
     Page<PurchasingDepartment> getAllByNameContains(String name, Pageable pageable);
 

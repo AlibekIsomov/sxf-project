@@ -4,6 +4,7 @@ package com.sxf.project.controller;
 import com.sxf.project.dto.PurchasingDepartmentDTO;
 import com.sxf.project.entity.PurchasingDepartment;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.PurchasingDepartmentRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.PurchasingDepartmentService;
@@ -42,37 +43,17 @@ public class PurchasingDepartmentController {
     }
     @Transactional
     @PostMapping
-    public ResponseEntity<PurchasingDepartment> create(@RequestBody PurchasingDepartmentDTO data, @CurrentUser User currentUser) throws Exception {
-        try {
-            Optional<PurchasingDepartment> purchasingDepartmentCreate = purchasingDepartmentService.create(data, currentUser);
-
-            if (purchasingDepartmentCreate.isPresent()) {
-                return ResponseEntity.ok(purchasingDepartmentCreate.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<?> create(@RequestBody PurchasingDepartmentDTO data, @CurrentUser User currentUser) throws Exception {
+            ApiResponse apiResponse = purchasingDepartmentService.create(data, currentUser);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PurchasingDepartment> update(@PathVariable Long id,
+    public ResponseEntity<?> update(@PathVariable Long id,
                                                        @RequestBody PurchasingDepartmentDTO data,
                                                        @CurrentUser User currentUser) throws Exception {
-        try {
-            Optional<PurchasingDepartment> updatedStore = purchasingDepartmentService.update(id, data, currentUser);
-
-            if (updatedStore.isPresent()) {
-                return ResponseEntity.ok(updatedStore.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NoSuchElementException storeNotFoundException) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            ApiResponse apiResponse = purchasingDepartmentService.update(id, data, currentUser);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
 

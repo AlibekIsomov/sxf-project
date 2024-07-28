@@ -4,6 +4,7 @@ package com.sxf.project.controller;
 import com.sxf.project.dto.ReportDTO;
 import com.sxf.project.entity.Report;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.ReportRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.ReportService;
@@ -42,18 +43,9 @@ public class ReportController {
 
     @Transactional
     @PostMapping
-    public ResponseEntity<Report> create(@RequestBody ReportDTO data, @CurrentUser User currentUser) throws Exception {
-        try {
-            Optional<Report> createReport = reportService.create(data, currentUser);
-
-            if (createReport.isPresent()) {
-                return ResponseEntity.ok(createReport.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<?> create(@RequestBody ReportDTO data, @CurrentUser User currentUser) throws Exception {
+            ApiResponse apiResponse = reportService.create(data, currentUser);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
     @GetMapping("/filial")
@@ -76,20 +68,9 @@ public class ReportController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Report> update(@PathVariable Long id, @RequestBody ReportDTO data, @CurrentUser User currentUser) {
-        try {
-            Optional<Report> updatedReport = reportService.update(id, data, currentUser);
-
-            if (updatedReport.isPresent()) {
-                return ResponseEntity.ok(updatedReport.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NoSuchElementException storeNotFoundException) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ReportDTO data, @CurrentUser User currentUser) throws Exception {
+            ApiResponse apiResponse = reportService.update(id, data, currentUser);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
     @DeleteMapping("/{id}")

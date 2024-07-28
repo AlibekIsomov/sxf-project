@@ -4,18 +4,17 @@ package com.sxf.project.controller;
 import com.sxf.project.dto.MonthlySalaryDTO;
 import com.sxf.project.entity.MonthlySalary;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.MonthlySalaryRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.MonthlySalaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -40,38 +39,21 @@ public class MonthlySalaryController {
     }
 
     @PostMapping
-    public ResponseEntity<MonthlySalary> create(@RequestBody MonthlySalaryDTO data,
+    public ResponseEntity<?> create(@RequestBody MonthlySalaryDTO data,
                                                 @CurrentUser User currentUser) throws Exception {
-        try {
-            Optional<MonthlySalary> createdMonthlySalary = monthlySalaryService.create(data, currentUser);
+        ApiResponse apiResponse = monthlySalaryService.create( data, currentUser);
 
-            if (createdMonthlySalary.isPresent()) {
-                return ResponseEntity.ok(createdMonthlySalary.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
         }
-    }
+
 
     @PutMapping("/{id}")
-    public ResponseEntity<MonthlySalary> update(@PathVariable Long id,
+    public ResponseEntity<?> update(@PathVariable Long id,
                                                 @RequestBody MonthlySalaryDTO data,
                                                 @CurrentUser User currentUser) throws Exception {
-        try {
-            Optional<MonthlySalary> updatedMonthlySalary = monthlySalaryService.update(id, data, currentUser);
+        ApiResponse apiResponse = monthlySalaryService.update(id, data, currentUser);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
 
-            if (updatedMonthlySalary.isPresent()) {
-                return ResponseEntity.ok(updatedMonthlySalary.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NoSuchElementException storeNotFoundException) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
     }
 
     @DeleteMapping("/{id}")

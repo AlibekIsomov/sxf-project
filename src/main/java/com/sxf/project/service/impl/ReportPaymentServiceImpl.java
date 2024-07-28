@@ -7,17 +7,16 @@ import com.sxf.project.repository.ReportPaymentRepository;
 import com.sxf.project.repository.ReportRepository;
 import com.sxf.project.service.ReportPaymentService;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 
 @Service
@@ -52,23 +51,16 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
             logger.info("Restricted: User's assigned filial does not match the worker's filial");
             return ResponseEntity.status(403).body(null);
         }
-        if (reportOptional.isPresent()) {
+        ReportPayment payment = new ReportPayment();
+        payment.setNewPayment(newPayment);
+        payment.setReport(report);
+
+        report.getPayments().add(payment);
 
 
-            ReportPayment payment = new ReportPayment();
-            payment.setNewPayment(newPayment);
-            payment.setReport(report);
+        reportRepository.save(report);
 
-            report.getPayments().add(payment);
-
-            // report.setLastPayment(newPayment);
-
-            reportRepository.save(report);
-
-            return ResponseEntity.ok(payment);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(payment);
     }
 
 
@@ -122,7 +114,7 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
     }
 
     @Override
-    public double calculateTotalPaymentsByReport(Long reportId){
+    public double calculateTotalPaymentsByReport(Long reportId) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + reportId));
 
@@ -171,7 +163,7 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
     }
 
     @Override
-    public ResponseEntity<List<ReportPaymentDTO>> getAllPayments(Long reportId, User currentUser){
+    public ResponseEntity<List<ReportPaymentDTO>> getAllPayments(Long reportId, User currentUser) {
 
         Optional<Report> reportOptional = reportRepository.findById(reportId);
 

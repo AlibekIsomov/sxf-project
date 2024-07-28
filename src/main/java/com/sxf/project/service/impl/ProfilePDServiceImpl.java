@@ -2,6 +2,7 @@ package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.ProfilePDDTO;
 import com.sxf.project.entity.*;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.FileRepository;
 import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.repository.ProfilePDRepository;
@@ -90,90 +91,79 @@ public class ProfilePDServiceImpl implements ProfilePDService {
     }
 
     @Override
-    public Optional<ProfilePD> create(ProfilePDDTO data, User currentUser) throws Exception {
+    public ApiResponse create(ProfilePDDTO data, User currentUser) throws Exception {
         Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
 
-        if (!optionalFilial.isPresent()) {
-            logger.info("Such ID filial does not exist!");
-            Optional.empty();
+        if (optionalFilial.isEmpty()) {
+            logger.info("Filial with ID {} does not exist!", data.getFilialId());
+            return new ApiResponse("Bunaqa Idlik filial yo'q!", false);
         }
+
         Filial checkFilial = optionalFilial.get();
-
         Filial assignedFilial = currentUser.getAssignedFilial();
-        if (assignedFilial == null) {
-            if (!currentUser.getRoles().equals(Role.ADMIN)) {
-                logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-                return Optional.empty();
-            }
-        } else {
-            // If the current user has an assigned filial, check if it matches the checkFilial
-            if (!assignedFilial.getId().equals(checkFilial.getId())) {
-                logger.info("Restricted: User's assigned filial does not match the checkFilial");
-                return Optional.empty();
-            }
-        }
 
+        if (isUserRestricted(currentUser, assignedFilial, checkFilial)) {
+            return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
+        }
 
         ProfilePD profilePD = new ProfilePD();
         profilePD.setName(data.getName());
         profilePD.setDescription(data.getDescription());
+        profilePD.setFilial(checkFilial);
 
-        profilePD.setFilial(optionalFilial.get());
-
-        return Optional.of(profilePDRepository.save(profilePD));
+        ProfilePD savedProfilePD = profilePDRepository.save(profilePD);
+        return new ApiResponse("ProfilePD muvaffaqiyatli yaratildi!", true, savedProfilePD);
     }
 
     @Override
-    public Optional<ProfilePD> update(Long id, ProfilePDDTO data, User currentUser) throws Exception {
+    public ApiResponse update(Long id, ProfilePDDTO data, User currentUser) throws Exception {
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
 
-        ProfilePD checkProfileDp = optionalProfilePD.get();
-
-        Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
-        ProfilePD profilePDUpdate = optionalProfilePD.get();
-        if (optionalProfilePD.isPresent()) {
-            logger.info("Such ID Porfile PD does not exist!");
-            Optional.empty();
+        if (optionalProfilePD.isEmpty()) {
+            logger.info("ProfilePD with ID {} does not exist!", id);
+            return new ApiResponse("Bunaqa Idlik ProfilePD yo'q!", false);
         }
-        FileEntity oldFileEntity = profilePDUpdate.getFileEntity();
-        // Check if fileId is provided before removing the FileEntity
+
+        ProfilePD profilePD = optionalProfilePD.get();
+        Optional<Filial> optionalFilial = filialRepository.findById(data.getFilialId());
+
+        if (optionalFilial.isEmpty()) {
+            logger.info("Filial with ID {} does not exist!", data.getFilialId());
+            return new ApiResponse("Bunaqa Idlik filial yo'q!", false);
+        }
+
+        Filial checkFilial = optionalFilial.get();
+        Filial assignedFilial = currentUser.getAssignedFilial();
+
+        if (isUserRestricted(currentUser, assignedFilial, checkFilial)) {
+            return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
+        }
+
+        updateFileEntity(data, profilePD);
+
+        profilePD.setName(data.getName());
+        profilePD.setDescription(data.getDescription());
+        profilePD.setFilial(checkFilial);
+
+        ProfilePD updatedProfilePD = profilePDRepository.save(profilePD);
+        return new ApiResponse("ProfilePD muvaffaqiyatli yangilandi!", true, updatedProfilePD);
+    }
+
+    private void updateFileEntity(ProfilePDDTO data, ProfilePD profilePD) {
+        FileEntity oldFileEntity = profilePD.getFileEntity();
+
         if (data.getFileEntityId() != null) {
             Optional<FileEntity> newFileEntityOptional = fileRepository.findById(data.getFileEntityId());
 
-            if (!newFileEntityOptional.isPresent()) {
-                logger.info("FileEntity with id " + data.getFileEntityId() + " does not exist");
-                return Optional.empty();
-            }
-            Filial checkFilial = optionalFilial.get();
-            Filial assignedFilial = currentUser.getAssignedFilial();
-            if (assignedFilial == null) {
-                if (!currentUser.getRoles().equals(Role.ADMIN)) {
-                    logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-                    return Optional.empty();
-                }
+            if (newFileEntityOptional.isPresent()) {
+                profilePD.setFileEntity(newFileEntityOptional.get());
             } else {
-                // If the current user has an assigned filial, check if it matches the checkFilial
-                if (!assignedFilial.getId().equals(checkFilial.getId())) {
-                    logger.info("Restricted: User's assigned filial does not match the checkFilial");
-                    return Optional.empty();
-                }
+                logger.info("FileEntity with ID {} does not exist!", data.getFileEntityId());
             }
-            // Set the new FileEntity
-            FileEntity newFileEntity = newFileEntityOptional.get();
-            profilePDUpdate.setFileEntity(newFileEntity);
-        } else {
-            // If fileId is not provided, remove the old FileEntity
-            if (oldFileEntity != null) {
-                // Delete the old FileEntity from the repository
-                fileRepository.delete(oldFileEntity);
-                // Remove the old FileEntity from the Store
-                profilePDUpdate.setFileEntity(null);
-            }
+        } else if (oldFileEntity != null) {
+            fileRepository.delete(oldFileEntity);
+            profilePD.setFileEntity(null);
         }
-        profilePDUpdate.setName(data.getName());
-        profilePDUpdate.setDescription(data.getDescription());
-
-        return Optional.of(profilePDRepository.save(profilePDUpdate));
     }
 
     @Override
@@ -200,7 +190,6 @@ public class ProfilePDServiceImpl implements ProfilePDService {
         if (optionalProfilePD.isPresent()) {
             ProfilePD checkProfileDp = optionalProfilePD.get();
         }
-        ;
         profilePDRepository.deleteById(id);
     }
 
@@ -237,5 +226,19 @@ public class ProfilePDServiceImpl implements ProfilePDService {
         workbook.write(outputStream);
         workbook.close();
         return new ByteArrayInputStream(outputStream.toByteArray());
+    }
+
+    private boolean isUserRestricted(User currentUser, Filial assignedFilial, Filial checkFilial) {
+        if (assignedFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return true;
+        }
+
+        if (assignedFilial != null && !assignedFilial.getId().equals(checkFilial.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial ({}) does not match the checkFilial ({})", assignedFilial.getId(), checkFilial.getId());
+            return true;
+        }
+
+        return false;
     }
 }

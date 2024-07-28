@@ -2,6 +2,7 @@ package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.PurchasingDepartmentDTO;
 import com.sxf.project.entity.*;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.ProfilePDRepository;
 import com.sxf.project.repository.PurchasingDepartmentRepository;
 import com.sxf.project.service.PurchasingDepartmentService;
@@ -9,7 +10,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     @Override
     public Optional<PurchasingDepartment> getById(Long id, User currentUser) throws Exception {
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
-        if(!purchasingDepartmentRepository.existsById(id)) {
+        if (!purchasingDepartmentRepository.existsById(id)) {
             logger.info("ProfilePD with id " + id + " does not exists");
             return Optional.empty();
         }
@@ -69,90 +69,84 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
-    public Optional<PurchasingDepartment> create(PurchasingDepartmentDTO data, User currentUser) throws Exception {
-        try {
-            Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
-
-            Filial Filialcheck = optionalProfilePD.get().getFilial();
-            Filial currentUserFilial = currentUser.getAssignedFilial();
-
-            // Check if the current user is not assigned to a filial and is not an admin
-            if (currentUserFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
-                logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-                return Optional.empty();
-            }
-
-            // If the current user has an assigned filial, check if it matches the worker's filial
-            if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
-                logger.info("Restricted: User's assigned filial does not match the worker's filial");
-                return Optional.empty();
-            }
-            if (!optionalProfilePD.isPresent()) {
-                logger.info("Such ID profileDB does not exist!");
-                return Optional.empty();
-            }
-            PurchasingDepartment purchasingDepartment = new PurchasingDepartment();
-            purchasingDepartment.setName(data.getName());
-            purchasingDepartment.setPrice(data.getPrice());
-            purchasingDepartment.setNumber(data.getNumber());
-            purchasingDepartment.setPayment(data.getPayment());
-            purchasingDepartment.setDescription(data.getDescription());
-
-            ProfilePD profilePD = optionalProfilePD.get();
-            if (profilePD.getId() == null) {
-                logger.error("ProfilePD ID is null");
-                throw new IllegalArgumentException("ProfilePD ID must not be null");
-            }
-            purchasingDepartment.setProfilePD(profilePD);
-
-            PurchasingDepartment savedPurchasingDepartment = purchasingDepartmentRepository.save(purchasingDepartment);
-            return Optional.of(savedPurchasingDepartment);
-        } catch (Exception e) {
-            logger.error("Error creating PurchasingDepartment", e);
-            throw new Exception("Error creating PurchasingDepartment", e);
-        }
-    }
-
-    public Optional<PurchasingDepartment> update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception {
-        Optional<PurchasingDepartment> optionalPurchasingDepartmentUpdate = purchasingDepartmentRepository.findById(id);
+    public ApiResponse create(PurchasingDepartmentDTO data, User currentUser) throws Exception {
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
 
-        if (!optionalProfilePD.isPresent()) {
-            logger.info("Such ID filial does not exist!");
-            return Optional.empty();
+        if (optionalProfilePD.isEmpty()) {
+            logger.info("Such ID ProfilePD does not exist!");
+            return new ApiResponse("Bunaqa Idlik ProfilePD yo'q!", false);
         }
 
-        Filial Filialcheck = optionalProfilePD.get().getFilial();
+        ProfilePD profilePD = optionalProfilePD.get();
+        Filial profilePDFilial = profilePD.getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
-        // Check if the current user is not assigned to a filial and is not an admin
+        if (isUserRestricted(currentUser, currentUserFilial, profilePDFilial)) {
+            return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
+        }
+
+        PurchasingDepartment purchasingDepartment = new PurchasingDepartment();
+        purchasingDepartment.setName(data.getName());
+        purchasingDepartment.setPrice(data.getPrice());
+        purchasingDepartment.setNumber(data.getNumber());
+        purchasingDepartment.setPayment(data.getPayment());
+        purchasingDepartment.setDescription(data.getDescription());
+        purchasingDepartment.setProfilePD(profilePD);
+
+        PurchasingDepartment savedPurchasingDepartment = purchasingDepartmentRepository.save(purchasingDepartment);
+        return new ApiResponse("PurchasingDepartment muvaffaqiyatli yaratildi!", true, savedPurchasingDepartment);
+    }
+
+    @Override
+    public ApiResponse update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception {
+        Optional<PurchasingDepartment> optionalPurchasingDepartment = purchasingDepartmentRepository.findById(id);
+
+        if (optionalPurchasingDepartment.isEmpty()) {
+            logger.info("Such ID PurchasingDepartment does not exist!");
+            return new ApiResponse("Bunaqa Idlik PurchasingDepartment yo'q!", false);
+        }
+
+        Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
+
+        if (optionalProfilePD.isEmpty()) {
+            logger.info("Such ID ProfilePD does not exist!");
+            return new ApiResponse("Bunaqa Idlik ProfilePD yo'q!", false);
+        }
+
+        ProfilePD profilePD = optionalProfilePD.get();
+        Filial profilePDFilial = profilePD.getFilial();
+        Filial currentUserFilial = currentUser.getAssignedFilial();
+
+        if (isUserRestricted(currentUser, currentUserFilial, profilePDFilial)) {
+            return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
+        }
+
+        PurchasingDepartment purchasingDepartment = optionalPurchasingDepartment.get();
+        purchasingDepartment.setName(data.getName());
+        purchasingDepartment.setPrice(data.getPrice());
+        purchasingDepartment.setNumber(data.getNumber());
+        purchasingDepartment.setPayment(data.getPayment());
+        purchasingDepartment.setDescription(data.getDescription());
+        purchasingDepartment.setProfilePD(profilePD);
+
+        PurchasingDepartment updatedPurchasingDepartment = purchasingDepartmentRepository.save(purchasingDepartment);
+        return new ApiResponse("PurchasingDepartment muvaffaqiyatli yangilandi!", true, updatedPurchasingDepartment);
+    }
+
+    private boolean isUserRestricted(User currentUser, Filial currentUserFilial, Filial checkFilial) {
         if (currentUserFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
             logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-            return Optional.empty();
+            return true;
         }
 
-        // If the current user has an assigned filial, check if it matches the worker's filial
-        if (currentUserFilial != null && !currentUserFilial.getId().equals(Filialcheck.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
-            logger.info("Restricted: User's assigned filial does not match the worker's filial");
-            return Optional.empty();
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(checkFilial.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the checkFilial");
+            return true;
         }
 
-        if (optionalPurchasingDepartmentUpdate.isPresent()) {
-            PurchasingDepartment PurchasingDepartmentUpdate = optionalPurchasingDepartmentUpdate.get();
-
-            PurchasingDepartmentUpdate.setName(data.getName());
-            PurchasingDepartmentUpdate.setPrice(data.getPrice());
-            PurchasingDepartmentUpdate.setNumber(data.getNumber());
-            PurchasingDepartmentUpdate.setPayment(data.getPayment());
-            PurchasingDepartmentUpdate.setDescription(data.getDescription());
-
-            // Save the updated
-            return Optional.of(purchasingDepartmentRepository.save(PurchasingDepartmentUpdate));
-        } else {
-            // Handle the case where with the given ID doesn't exist
-            throw new ChangeSetPersister.NotFoundException();
-        }
+        return false;
     }
+
     @Override
     public Page<PurchasingDepartment> getAllByNameContains(String name, Pageable pageable) {
         return purchasingDepartmentRepository.findAllByName(name, pageable);
@@ -173,7 +167,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         PurchasingDepartment purchasingDepartment = purchasingDepartmentRepository.findById(profilePDId)
                 .orElseThrow(() -> new EntityNotFoundException("Report not found for id: " + profilePDId));
 
-        ProfilePD profilePD  = purchasingDepartment.getProfilePD();
+        ProfilePD profilePD = purchasingDepartment.getProfilePD();
 
         Long totalAmount = purchasingDepartment.getFullAmount();
         Long paidAmount = purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePD);
@@ -183,7 +177,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
 
     @Override
     public void deleteById(Long id, User currentUser) {
-        if(!purchasingDepartmentRepository.existsById(id)) {
+        if (!purchasingDepartmentRepository.existsById(id)) {
             logger.info("ProfilePD with id " + id + " does not exists");
 
             Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(id);
@@ -202,7 +196,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
             if (!optionalProfilePD.isPresent()) {
                 logger.info("Such ID filial does not exist!");
             }
-        };
+        }
         purchasingDepartmentRepository.deleteById(id);
     }
 

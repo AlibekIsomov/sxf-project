@@ -3,6 +3,7 @@ package com.sxf.project.service;
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.entity.Filial;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.service.impl.FilialServiceImpl;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -21,9 +22,10 @@ public interface FilialService {
 
     List<Filial> getAllManagers(User user);
 
-    Optional<Filial> create(FilialDTO data) throws Exception;
 
-    Optional<Filial> update(Long id, FilialDTO data) throws Exception;
+    ApiResponse create(FilialDTO data) throws Exception;
+
+    ApiResponse update(Long id, FilialDTO data) throws Exception;
 
     Page<Filial> getAllByNameContains(String name, Pageable pageable);
 

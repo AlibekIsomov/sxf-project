@@ -3,6 +3,7 @@ package com.sxf.project.service;
 import com.sxf.project.dto.ProfilePDDTO;
 import com.sxf.project.entity.ProfilePD;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,9 +21,10 @@ public interface ProfilePDService {
 
     Optional<ProfilePD> getById(Long id, User currentUser) throws Exception;
 
-    Optional<ProfilePD> create(ProfilePDDTO data, User currentUser) throws Exception;
 
-    Optional<ProfilePD> update(Long id, ProfilePDDTO data, User currentUser) throws Exception;
+    ApiResponse create(ProfilePDDTO data, User currentUser) throws Exception;
+
+    ApiResponse update(Long id, ProfilePDDTO data, User currentUser) throws Exception;
 
     Page<ProfilePD> getAllByNameContains(String name, Pageable pageable);
 

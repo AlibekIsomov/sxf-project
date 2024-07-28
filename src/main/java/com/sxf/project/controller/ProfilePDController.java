@@ -4,6 +4,7 @@ package com.sxf.project.controller;
 import com.sxf.project.dto.ProfilePDDTO;
 import com.sxf.project.entity.ProfilePD;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.ProfilePDRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.ProfilePDService;
@@ -69,36 +70,18 @@ public class ProfilePDController {
 
     @Transactional
     @PostMapping
-    public ResponseEntity<ProfilePD> create(@RequestBody ProfilePDDTO data, @CurrentUser User currentUser) throws Exception {
-        try {
-            Optional<ProfilePD> createProfilePD = profilePDService.create(data, currentUser);
+    public ResponseEntity<?> create(@RequestBody ProfilePDDTO data, @CurrentUser User currentUser) throws Exception {
+            ApiResponse apiResponse = profilePDService.create(data, currentUser);
 
-            if (createProfilePD.isPresent()) {
-                return ResponseEntity.ok(createProfilePD.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<ProfilePD> update(@PathVariable Long id, @RequestBody ProfilePDDTO data, @CurrentUser User currentUser) {
-        try {
-            Optional<ProfilePD> updatedProfilePD = profilePDService.update(id, data, currentUser);
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ProfilePDDTO data, @CurrentUser User currentUser)  throws Exception {
+            ApiResponse apiResponse = profilePDService.update(id, data, currentUser);
 
-            if (updatedProfilePD.isPresent()) {
-                return ResponseEntity.ok(updatedProfilePD.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NoSuchElementException storeNotFoundException) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
     @Transactional
     @GetMapping("/export/{filialId}")

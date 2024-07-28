@@ -2,6 +2,7 @@ package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.MonthlySalaryPaymentDTO;
 import com.sxf.project.entity.*;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.MonthlySalaryPaymentRepository;
 import com.sxf.project.repository.MonthlySalaryRepository;
 import com.sxf.project.service.MonthlySalaryPaymentService;
@@ -27,72 +28,74 @@ public class MonthlySalaryPaymentServiceImpl implements MonthlySalaryPaymentServ
 
 
     @Override
-    public Optional<MonthlySalaryPayment> create(MonthlySalaryPaymentDTO data, User currentUser) throws Exception {
-
+    public ApiResponse create(MonthlySalaryPaymentDTO data, User currentUser) throws Exception {
         Optional<MonthlySalary> monthlySalaryOptional = monthlySalaryRepository.findById(data.getMonthlySalaryId());
-        MonthlySalary checkFilial = monthlySalaryOptional.get();
 
+        if (monthlySalaryOptional.isEmpty()) {
+            logger.info("Such ID MonthlySalary does not exist!");
+            return new ApiResponse("Bunaqa Idlik MonthlySalary yo'q!", false);
+        }
+
+        MonthlySalary checkFilial = monthlySalaryOptional.get();
         Filial workerFilial = checkFilial.getWorker().getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
-        // Check if the current user is not assigned to a filial and is not an admin
-        if (currentUserFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
-            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
-        }
-
-        // If the current user has an assigned filial, check if it matches the worker's filial
-        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
-            logger.info("Restricted: User's assigned filial does not match the worker's filial");
-        }
-
-        if (!monthlySalaryOptional.isPresent()) {
-
-            logger.info("Such ID category does not exist!");
+        if (isUserRestricted(currentUser, currentUserFilial, workerFilial)) {
+            return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
         }
 
         MonthlySalaryPayment monthlySalaryPayment = new MonthlySalaryPayment();
         monthlySalaryPayment.setPaymentAmount(data.getPaymentAmount());
         monthlySalaryPayment.setMonthlySalary(monthlySalaryOptional.get());
 
-        return Optional.of(monthlySalaryPaymentRepository.save(monthlySalaryPayment));
+        MonthlySalaryPayment savedPayment = monthlySalaryPaymentRepository.save(monthlySalaryPayment);
+        return new ApiResponse("MonthlySalaryPayment muvaffaqiyatli yaratildi!", true, savedPayment);
     }
 
-
     @Override
-    public Optional<MonthlySalaryPayment> update(Long id, MonthlySalaryPaymentDTO data, User currentUser) throws Exception {
+    public ApiResponse update(Long id, MonthlySalaryPaymentDTO data, User currentUser) throws Exception {
+        Optional<MonthlySalaryPayment> optionalMonthlySalaryPayment = monthlySalaryPaymentRepository.findById(id);
 
-        Optional<MonthlySalaryPayment> optionalMonthlySalaryPayments = monthlySalaryPaymentRepository.findById(id);
-
-        if (!optionalMonthlySalaryPayments.isPresent()) {
-            logger.info("Such ID MonthlySalaryPayments does not exist!");
+        if (optionalMonthlySalaryPayment.isEmpty()) {
+            logger.info("Such ID MonthlySalaryPayment does not exist!");
+            return new ApiResponse("Bunaqa Idlik MonthlySalaryPayment yo'q!", false);
         }
 
         Optional<MonthlySalary> monthlySalaryOptional = monthlySalaryRepository.findById(data.getMonthlySalaryId());
+
+        if (monthlySalaryOptional.isEmpty()) {
+            logger.info("Such ID MonthlySalary does not exist!");
+            return new ApiResponse("Bunaqa Idlik MonthlySalary yo'q!", false);
+        }
+
         MonthlySalary checkFilial = monthlySalaryOptional.get();
         Filial workerFilial = checkFilial.getWorker().getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
-        // Check if the current user is not assigned to a filial and is not an admin
-        if (currentUserFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
-            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+        if (isUserRestricted(currentUser, currentUserFilial, workerFilial)) {
+            return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
         }
 
-        // If the current user has an assigned filial, check if it matches the worker's filial
-        if (currentUserFilial != null && !currentUserFilial.getId().equals(workerFilial.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
-            logger.info("Restricted: User's assigned filial does not match the worker's filial");
-        }
-
-        if (!monthlySalaryOptional.isPresent()) {
-            logger.info("Such ID monthlySalary does not exist!");
-        }
-
-        MonthlySalaryPayment monthlySalaryPayment = optionalMonthlySalaryPayments.get();
-
+        MonthlySalaryPayment monthlySalaryPayment = optionalMonthlySalaryPayment.get();
         monthlySalaryPayment.setPaymentAmount(data.getPaymentAmount());
         monthlySalaryPayment.setMonthlySalary(monthlySalaryOptional.get());
 
+        MonthlySalaryPayment updatedPayment = monthlySalaryPaymentRepository.save(monthlySalaryPayment);
+        return new ApiResponse("MonthlySalaryPayment muvaffaqiyatli yangilandi!", true, updatedPayment);
+    }
 
-        return Optional.of(monthlySalaryPaymentRepository.save(monthlySalaryPayment));
+    private boolean isUserRestricted(User currentUser, Filial currentUserFilial, Filial checkFilial) {
+        if (currentUserFilial == null && !currentUser.getRoles().equals(Role.ADMIN)) {
+            logger.info("Restricted: User does not have an assigned filial and is not an ADMIN");
+            return true;
+        }
+
+        if (currentUserFilial != null && !currentUserFilial.getId().equals(checkFilial.getId()) && !currentUser.getRoles().equals(Role.ADMIN)) {
+            logger.info("Restricted: User's assigned filial does not match the checkFilial");
+            return true;
+        }
+
+        return false;
     }
 
     @Override

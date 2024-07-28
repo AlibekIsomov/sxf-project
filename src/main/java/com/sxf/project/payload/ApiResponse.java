@@ -1,5 +1,6 @@
 package com.sxf.project.payload;
 
+import com.sxf.project.entity.Filial;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

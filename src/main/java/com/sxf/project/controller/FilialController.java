@@ -4,6 +4,7 @@ package com.sxf.project.controller;
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.entity.Filial;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.payload.ResourceNotFoundException;
 import com.sxf.project.repository.FilialRepository;
 import com.sxf.project.security.CurrentUser;
@@ -49,47 +50,27 @@ public class FilialController {
     public ResponseEntity<Filial> getById(@PathVariable Long id) throws Exception {
         return filialService.getById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<Filial> create(@RequestBody FilialDTO data) throws Exception {
-        try {
-            Optional<Filial> createFilial = filialService.create(data);
-
-            if (createFilial.isPresent()) {
-                return ResponseEntity.ok(createFilial.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<?> create(@RequestBody FilialDTO data) throws Exception {
+           ApiResponse apiResponse = filialService.create(data);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
     @GetMapping("/managers")
     public ResponseEntity<List<Filial>> getAllManagers(@CurrentUser User currentUser) {
         List<Filial> filialList = filialService.getAllManagers(currentUser);
         if (filialList.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
         return ResponseEntity.ok(filialList);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PutMapping("/{id}")
-    public ResponseEntity<Filial> update(@PathVariable Long id, @RequestBody FilialDTO data) {
-        try {
-            Optional<Filial> updatedFilal = filialService.update(id, data);
-
-            if (updatedFilal.isPresent()) {
-                return ResponseEntity.ok(updatedFilal.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NoSuchElementException storeNotFoundException) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody FilialDTO data) throws Exception {
+        ApiResponse apiResponse = filialService.update(id, data);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
@@ -112,7 +93,7 @@ public class FilialController {
         filialService.deleteById(id);
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{filialId}/assign-manager/{managerId}")
     public ResponseEntity<FilialDTO> assignFilialToManager(@PathVariable Long filialId, @PathVariable Long managerId) {
         try {
