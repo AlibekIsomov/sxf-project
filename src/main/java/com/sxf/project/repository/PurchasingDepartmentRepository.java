@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -22,5 +23,11 @@ public interface PurchasingDepartmentRepository extends JpaRepository<Purchasing
     List<PurchasingDepartment> findByFilialId(@Param("filialId") Long filialId);
 
     List<PurchasingDepartment> findAllByProfilePDId(Long id);
+
+    @Query("SELECT pd FROM PurchasingDepartment pd WHERE pd.createdAt BETWEEN :fromDate AND :toDate")
+    List<PurchasingDepartment> findByDateRange(@Param("fromDate") Date fromDate, @Param("toDate") Date toDate);
+
+    @Query("SELECT pd FROM PurchasingDepartment pd JOIN pd.profilePD w WHERE w.filial.id = :filialId AND pd.createdAt BETWEEN :fromDate AND :toDate")
+    List<PurchasingDepartment> findByFilialIdAndDateRange(@Param("filialId") Long filialId, @Param("fromDate") Date fromDate, @Param("toDate") Date toDate);
 }
 

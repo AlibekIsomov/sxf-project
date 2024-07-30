@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -182,6 +183,170 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
         // Retrieve and classify MonthlySalaryPayments (outcome)
         List<MonthlySalaryPayment> salaryPayments = monthlySalaryPaymentRepository.findByFilialId(filialId);
+        for (MonthlySalaryPayment salaryPayment : salaryPayments) {
+            Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
+            String entityName = worker != null ? worker.getName() : "Unknown Worker";
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            payments.add(paymentDTO);
+            totalOutcome += salaryPayment.getPaymentAmount();
+        }
+
+        PaymentStatisticsResponseDTO response = new PaymentStatisticsResponseDTO();
+        response.setPayments(payments);
+        response.setTotal(totalOutcome);
+        return response;
+    }
+
+
+    @Override
+    public List<PaymentStatisticDTO> getPaymentsFromToDate(Date fromDate, Date toDate) {
+        List<PaymentStatisticDTO> payments = new ArrayList<>();
+
+        // Retrieve and classify ReportPayments
+        List<ReportPayment> reportPayments = reportPaymentRepository.findByDateRange(fromDate, toDate);
+        for (ReportPayment reportPayment : reportPayments) {
+            String entityName = reportPayment.getReport().getName();
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            payments.add(paymentDTO);
+        }
+
+        // Retrieve and classify PurchasingDepartment payments
+        List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByDateRange(fromDate, toDate);
+        for (PurchasingDepartment purchase : purchases) {
+            String entityName = purchase.getName();
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            payments.add(paymentDTO);
+        }
+
+        // Retrieve and classify MonthlySalaryPayments
+        List<MonthlySalaryPayment> salaryPayments = monthlySalaryPaymentRepository.findByDateRange(fromDate, toDate);
+        for (MonthlySalaryPayment salaryPayment : salaryPayments) {
+            Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
+            String entityName = worker != null ? worker.getName() : "Unknown Worker";
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            payments.add(paymentDTO);
+        }
+
+        return payments;
+    }
+    @Override
+    public PaymentStatisticsResponseDTO getAllIncomeFromToDate(Date fromDate, Date toDate) {
+        List<PaymentStatisticDTO> payments = new ArrayList<>();
+        double totalIncome = 0.0;
+
+        // Retrieve and classify ReportPayments (income)
+        List<ReportPayment> reportPayments = reportPaymentRepository.findByDateRange(fromDate, toDate);
+        for (ReportPayment reportPayment : reportPayments) {
+            String entityName = reportPayment.getReport().getName(); // Assuming Report has a getName method
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            payments.add(paymentDTO);
+            totalIncome += reportPayment.getNewPayment();
+        }
+
+        PaymentStatisticsResponseDTO response = new PaymentStatisticsResponseDTO();
+        response.setPayments(payments);
+        response.setTotal(totalIncome);
+        return response;
+    }
+
+    @Override
+    public PaymentStatisticsResponseDTO getAllOutcomeFromToDate(Date fromDate, Date toDate) {
+        List<PaymentStatisticDTO> payments = new ArrayList<>();
+        double totalOutcome = 0.0;
+
+        // Retrieve and classify PurchasingDepartment payments (outcome)
+        List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByDateRange(fromDate, toDate);
+        for (PurchasingDepartment purchase : purchases) {
+            String entityName = purchase.getName();
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            payments.add(paymentDTO);
+            totalOutcome += purchase.getPayment();
+        }
+
+        // Retrieve and classify MonthlySalaryPayments (outcome)
+        List<MonthlySalaryPayment> salaryPayments = monthlySalaryPaymentRepository.findByDateRange(fromDate, toDate);
+        for (MonthlySalaryPayment salaryPayment : salaryPayments) {
+            Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
+            String entityName = worker != null ? worker.getName() : "Unknown Worker";
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            payments.add(paymentDTO);
+            totalOutcome += salaryPayment.getPaymentAmount();
+        }
+
+        PaymentStatisticsResponseDTO response = new PaymentStatisticsResponseDTO();
+        response.setPayments(payments);
+        response.setTotal(totalOutcome);
+        return response;
+    }
+
+    @Override
+    public List<PaymentStatisticDTO> getPaymentsByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate) {
+        List<PaymentStatisticDTO> payments = new ArrayList<>();
+
+        // Retrieve and classify ReportPayments
+        List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
+        for (ReportPayment reportPayment : reportPayments) {
+            String entityName = reportPayment.getReport().getName();
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            payments.add(paymentDTO);
+        }
+
+        // Retrieve and classify PurchasingDepartment payments
+        List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
+        for (PurchasingDepartment purchase : purchases) {
+            String entityName = purchase.getName();
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            payments.add(paymentDTO);
+        }
+
+        // Retrieve and classify MonthlySalaryPayments
+        List<MonthlySalaryPayment> salaryPayments = monthlySalaryPaymentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
+        for (MonthlySalaryPayment salaryPayment : salaryPayments) {
+            Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
+            String entityName = worker != null ? worker.getName() : "Unknown Worker";
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            payments.add(paymentDTO);
+        }
+
+        return payments;
+    }
+
+    @Override
+    public PaymentStatisticsResponseDTO getAllIncomeByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate) {
+        List<PaymentStatisticDTO> payments = new ArrayList<>();
+        double totalIncome = 0.0;
+
+        // Retrieve and classify ReportPayments (income)
+        List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
+        for (ReportPayment reportPayment : reportPayments) {
+            String entityName = reportPayment.getReport().getName(); // Assuming Report has a getName method
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            payments.add(paymentDTO);
+            totalIncome += reportPayment.getNewPayment();
+        }
+
+        PaymentStatisticsResponseDTO response = new PaymentStatisticsResponseDTO();
+        response.setPayments(payments);
+        response.setTotal(totalIncome);
+        return response;
+    }
+
+    @Override
+    public PaymentStatisticsResponseDTO getAllOutcomeByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate) {
+        List<PaymentStatisticDTO> payments = new ArrayList<>();
+        double totalOutcome = 0.0;
+
+        // Retrieve and classify PurchasingDepartment payments (outcome)
+        List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
+        for (PurchasingDepartment purchase : purchases) {
+            String entityName = purchase.getName();
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            payments.add(paymentDTO);
+            totalOutcome += purchase.getPayment();
+        }
+
+        // Retrieve and classify MonthlySalaryPayments (outcome)
+        List<MonthlySalaryPayment> salaryPayments = monthlySalaryPaymentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";

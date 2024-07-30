@@ -39,7 +39,7 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
     }
 
     @Override
-    public List<CostumerDepartment> getAllByProfileDBId(Long id) {
+    public List<CostumerDepartment> getAllByProfileCDId(Long id) {
         return costumerDepartmentRepository.findAllByProfileCDId(id);
     }
 
@@ -99,6 +99,7 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
         return new ApiResponse("Jarayon muvaffaqiyatli bajarildi!", true, costumerDepartment);
     }
 
+    @Override
     public ApiResponse update(Long id, CostumerDepartmentDTO data, User currentUser) throws Exception {
         Optional<CostumerDepartment> optionalCostumerDepartment = costumerDepartmentRepository.findById(id);
 

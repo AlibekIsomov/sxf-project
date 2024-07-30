@@ -2,7 +2,6 @@ package com.sxf.project.service;
 
 import com.sxf.project.dto.CostumerDepartmentDTO;
 import com.sxf.project.entity.CostumerDepartment;
-import com.sxf.project.entity.PurchasingDepartment;
 import com.sxf.project.entity.User;
 import com.sxf.project.payload.ApiResponse;
 import org.springframework.data.domain.Page;
@@ -15,11 +14,13 @@ public interface CostumerDepartmentService {
 
     Page<CostumerDepartment> getAll(Pageable pageable) throws Exception;
 
-    List<CostumerDepartment> getAllByProfileDBId(Long id);
+    List<CostumerDepartment> getAllByProfileCDId(Long id);
 
     Optional<CostumerDepartment> getById(Long id, User currentUser) throws Exception;
 
     ApiResponse create(CostumerDepartmentDTO data, User currentUser) throws Exception;
+
+    ApiResponse update(Long id, CostumerDepartmentDTO data, User currentUser) throws Exception;
 
     Page<CostumerDepartment> getAllByNameContains(String name, Pageable pageable);
 
