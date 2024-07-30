@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("\"/api/costumerDepartment")
+@RequestMapping("/api/costumerDepartment")
 public class CostumerDepartmentController {
     @Autowired
     CostumerDepartmentService costumerDepartmentService;
