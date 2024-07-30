@@ -24,9 +24,9 @@ public interface CostumerDepartmentService {
 
     Page<CostumerDepartment> getAllByNameContains(String name, Pageable pageable);
 
-    Long getTotalFullAmountByProfilePD(Long profileCDId);
+    Long getTotalFullAmountByProfileCD(Long profileCDId);
 
-    Long getRemainingPaymentByProfilePD(Long profilePDId);
+    Long getRemainingPaymentByProfileCD(Long profileCDId);
 
     ApiResponse deleteById(Long id, User currentUser);
 }

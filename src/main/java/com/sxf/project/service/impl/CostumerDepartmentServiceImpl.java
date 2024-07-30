@@ -143,7 +143,7 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
     }
 
     @Override
-    public Long getTotalFullAmountByProfilePD(Long profileCDId) {
+    public Long getTotalFullAmountByProfileCD(Long profileCDId) {
         CostumerDepartment costumerDepartment = costumerDepartmentRepository.findById(profileCDId)
                 .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + profileCDId));
 
@@ -153,9 +153,9 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
     }
 
     @Override
-    public Long getRemainingPaymentByProfilePD(Long profilePDId) {
-        CostumerDepartment costumerDepartment = costumerDepartmentRepository.findById(profilePDId)
-                .orElseThrow(() -> new EntityNotFoundException("Report not found for id: " + profilePDId));
+    public Long getRemainingPaymentByProfileCD(Long profileCDId) {
+        CostumerDepartment costumerDepartment = costumerDepartmentRepository.findById(profileCDId)
+                .orElseThrow(() -> new EntityNotFoundException("Report not found for id: " + profileCDId));
 
         ProfileCD profileCD = costumerDepartment.getProfileCD();
 

@@ -55,15 +55,15 @@ public class CostumerDepartmentController {
     }
 
 
-    @GetMapping("/full-amount/{profilePDId}")
-    public ResponseEntity<Long> getTotalFullAmount(@PathVariable Long profilePDId) {
-        Long totalFullAmount = costumerDepartmentService.getTotalFullAmountByProfilePD(profilePDId);
+    @GetMapping("/full-amount/{profileCDId}")
+    public ResponseEntity<Long> getTotalFullAmount(@PathVariable Long profileCDId) {
+        Long totalFullAmount = costumerDepartmentService.getTotalFullAmountByProfileCD(profileCDId);
         return ResponseEntity.ok(totalFullAmount);
     }
 
-    @GetMapping("/remaining-payment/{profilePDId}")
-    public ResponseEntity<Long> getRemainingPayment(@PathVariable Long profilePDId) {
-        Long remainingPayment = costumerDepartmentService.getRemainingPaymentByProfilePD(profilePDId);
+    @GetMapping("/remaining-payment/{profileCDId}")
+    public ResponseEntity<Long> getRemainingPayment(@PathVariable Long profileCDId) {
+        Long remainingPayment = costumerDepartmentService.getRemainingPaymentByProfileCD(profileCDId);
         return ResponseEntity.ok(remainingPayment);
     }
 
@@ -73,7 +73,7 @@ public class CostumerDepartmentController {
         costumerDepartmentService.deleteById(id, currentUser);
     }
 
-    @GetMapping("/profilePD/{id}")
+    @GetMapping("/profileCD/{id}")
     public ResponseEntity<?> getProfilePDByFilial(@PathVariable Long id) {
         List<CostumerDepartment> purchasingDepartments = costumerDepartmentService.getAllByProfileCDId(id);
         if (purchasingDepartments.isEmpty()) {
