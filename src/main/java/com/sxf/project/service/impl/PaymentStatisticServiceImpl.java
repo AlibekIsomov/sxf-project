@@ -43,7 +43,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialId(filialId);
         for (ReportPayment reportPayment : reportPayments) {
             String entityName = reportPayment.getReport().getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName, reportPayment.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -51,7 +51,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByFilialId(filialId);
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName,purchase.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -60,7 +60,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName, salaryPayment.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -74,7 +74,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<ReportPayment> reportPayments = reportPaymentRepository.findAll();
         for (ReportPayment reportPayment : reportPayments) {
             String entityName = reportPayment.getReport().getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName, reportPayment.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -82,7 +82,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findAll();
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName, purchase.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -91,7 +91,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName, salaryPayment.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -107,7 +107,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<ReportPayment> reportPayments = reportPaymentRepository.findAll();
         for (ReportPayment reportPayment : reportPayments) {
             String entityName = reportPayment.getReport().getName(); // Assuming Report has a getName method
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName, reportPayment.getCreatedAt());
             payments.add(paymentDTO);
             totalIncome += reportPayment.getNewPayment();
         }
@@ -127,7 +127,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findAll();
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName, purchase.getCreatedAt());
             payments.add(paymentDTO);
             totalOutcome += purchase.getPayment();
         }
@@ -137,7 +137,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName, salaryPayment.getCreatedAt());
             payments.add(paymentDTO);
             totalOutcome += salaryPayment.getPaymentAmount();
         }
@@ -157,7 +157,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialId(filialId);
         for (ReportPayment reportPayment : reportPayments) {
             String entityName = reportPayment.getReport().getName(); // Assuming Report has a getName method
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName, reportPayment.getCreatedAt());
             payments.add(paymentDTO);
             totalIncome += reportPayment.getNewPayment();
         }
@@ -177,7 +177,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByFilialId(filialId);
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName, purchase.getCreatedAt());
             payments.add(paymentDTO);
             totalOutcome += purchase.getPayment();
         }
@@ -187,7 +187,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName, salaryPayment.getCreatedAt());
             payments.add(paymentDTO);
             totalOutcome += salaryPayment.getPaymentAmount();
         }
@@ -207,7 +207,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<ReportPayment> reportPayments = reportPaymentRepository.findByDateRange(fromDate, toDate);
         for (ReportPayment reportPayment : reportPayments) {
             String entityName = reportPayment.getReport().getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName, reportPayment.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -215,7 +215,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByDateRange(fromDate, toDate);
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName, purchase.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -224,7 +224,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName, salaryPayment.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -239,7 +239,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<ReportPayment> reportPayments = reportPaymentRepository.findByDateRange(fromDate, toDate);
         for (ReportPayment reportPayment : reportPayments) {
             String entityName = reportPayment.getReport().getName(); // Assuming Report has a getName method
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName, reportPayment.getCreatedAt());
             payments.add(paymentDTO);
             totalIncome += reportPayment.getNewPayment();
         }
@@ -259,7 +259,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByDateRange(fromDate, toDate);
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName, purchase.getCreatedAt());
             payments.add(paymentDTO);
             totalOutcome += purchase.getPayment();
         }
@@ -269,7 +269,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName, salaryPayment.getCreatedAt());
             payments.add(paymentDTO);
             totalOutcome += salaryPayment.getPaymentAmount();
         }
@@ -288,7 +288,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
         for (ReportPayment reportPayment : reportPayments) {
             String entityName = reportPayment.getReport().getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName, reportPayment.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -296,7 +296,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName, purchase.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -305,7 +305,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName, salaryPayment.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -321,7 +321,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
         for (ReportPayment reportPayment : reportPayments) {
             String entityName = reportPayment.getReport().getName(); // Assuming Report has a getName method
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(reportPayment.getId(), reportPayment.getNewPayment(), "income", "ReportPayment", entityName, reportPayment.getCreatedAt());
             payments.add(paymentDTO);
             totalIncome += reportPayment.getNewPayment();
         }
@@ -341,7 +341,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName, purchase.getCreatedAt());
             payments.add(paymentDTO);
             totalOutcome += purchase.getPayment();
         }
@@ -351,7 +351,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         for (MonthlySalaryPayment salaryPayment : salaryPayments) {
             Worker worker = workerRepository.findById(salaryPayment.getMonthlySalary().getWorker().getId()).orElse(null); // Assuming MonthlySalary has a getWorker method
             String entityName = worker != null ? worker.getName() : "Unknown Worker";
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName);
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(salaryPayment.getId(), salaryPayment.getPaymentAmount(), "outcome", "MonthlySalaryPayment", entityName, salaryPayment.getCreatedAt());
             payments.add(paymentDTO);
             totalOutcome += salaryPayment.getPaymentAmount();
         }
