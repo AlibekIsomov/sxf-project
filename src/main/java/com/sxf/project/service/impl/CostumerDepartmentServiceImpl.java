@@ -40,6 +40,9 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
 
     @Override
     public List<CostumerDepartment> getAllByProfileCDId(Long id) {
+        if (!profileCDRepository.existsById(id)) {
+            throw new IllegalArgumentException("ProfileCD with id " + id + " does not exist");
+        }
         return costumerDepartmentRepository.findAllByProfileCDId(id);
     }
 
@@ -160,7 +163,7 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
         ProfileCD profileCD = costumerDepartment.getProfileCD();
 
         Long totalAmount = costumerDepartment.getFullAmount();
-        Long paidAmount = costumerDepartmentRepository.calculateTotalFullAmountByProfileCD(profileCD);
+        Long paidAmount = costumerDepartmentRepository.calculateTotalPayment(profileCD);
 
         return totalAmount - paidAmount;
     }

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -61,45 +62,45 @@ public class PaymentStatisticController {
     @GetMapping("/paymentsByFilialId")
     public List<PaymentStatisticDTO> getPaymentsFromToDateByFilialId(
             @RequestParam("filialId") Long filialId,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
+            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getPaymentsByFilialIdFromToDate(filialId, fromDate, toDate);
     }
 
     @GetMapping("/incomeByFilialId")
     public PaymentStatisticsResponseDTO getAllIncomeFromToDateByFilialId(
             @RequestParam("filialId") Long filialId,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
+            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getAllIncomeByFilialIdFromToDate(filialId, fromDate, toDate);
     }
 
     @GetMapping("/outcomeByFilialId")
     public PaymentStatisticsResponseDTO getAllOutcomeFromToDateByFilialId(
             @RequestParam("filialId") Long filialId,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
+            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getAllIncomeByFilialIdFromToDate(filialId, fromDate, toDate);
     }
 
     @GetMapping
     public List<PaymentStatisticDTO> getPaymentsFromToDate(
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
+            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getPaymentsFromToDate(fromDate, toDate);
     }
 
     @GetMapping("/income")
     public PaymentStatisticsResponseDTO getAllIncomeFromToDate(
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
+            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getAllIncomeFromToDate(fromDate, toDate);
     }
 
     @GetMapping("/outcome")
     public PaymentStatisticsResponseDTO getAllOutcomFromToDatee(
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
+            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getAllOutcomeFromToDate(fromDate, toDate);
     }
 }

@@ -2,6 +2,7 @@ package com.sxf.project.repository;
 
 import com.sxf.project.entity.CostumerDepartment;
 import com.sxf.project.entity.ProfileCD;
+import com.sxf.project.entity.ProfilePD;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,9 @@ public interface CostumerDepartmentRepository extends JpaRepository<CostumerDepa
 
     @Query("SELECT msp FROM CostumerDepartment msp JOIN msp.profileCD  w WHERE w.filial.id = :filialId")
     List<CostumerDepartment> findByFilialId(@Param("filialId") Long filialId);
+
+    @Query("SELECT COALESCE(SUM(pd.payment), 0) FROM CostumerDepartment pd WHERE pd.profileCD = :profileCD")
+    Long calculateTotalPayment(@Param("profileCD") ProfileCD profileCD);
 
     List<CostumerDepartment> findAllByProfileCDId(Long id);
 }

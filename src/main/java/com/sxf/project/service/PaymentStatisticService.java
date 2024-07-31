@@ -3,6 +3,7 @@ package com.sxf.project.service;
 import com.sxf.project.dto.PaymentStatisticDTO;
 import com.sxf.project.dto.PaymentStatisticsResponseDTO;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -21,17 +22,17 @@ public interface PaymentStatisticService {
 
     PaymentStatisticsResponseDTO getOutcomeByFilialId(Long filialId);
 
-    List<PaymentStatisticDTO> getPaymentsFromToDate(Date fromDate, Date toDate);
+    List<PaymentStatisticDTO> getPaymentsFromToDate(Instant fromDate, Instant toDate);
 
-    PaymentStatisticsResponseDTO getAllIncomeFromToDate(Date fromDate, Date toDate);
+    PaymentStatisticsResponseDTO getAllIncomeFromToDate(Instant fromDate, Instant toDate);
 
-    PaymentStatisticsResponseDTO getAllOutcomeFromToDate(Date fromDate, Date toDate);
+    PaymentStatisticsResponseDTO getAllOutcomeFromToDate(Instant fromDate, Instant toDate);
 
-    List<PaymentStatisticDTO> getPaymentsByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate);
+    List<PaymentStatisticDTO> getPaymentsByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate);
 
-    PaymentStatisticsResponseDTO getAllIncomeByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate);
+    PaymentStatisticsResponseDTO getAllIncomeByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate);
 
-    PaymentStatisticsResponseDTO getAllOutcomeByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate);
+    PaymentStatisticsResponseDTO getAllOutcomeByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate);
 
 
 }

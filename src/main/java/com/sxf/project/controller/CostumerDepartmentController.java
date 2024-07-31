@@ -76,9 +76,6 @@ public class CostumerDepartmentController {
     @GetMapping("/profileCD/{id}")
     public ResponseEntity<?> getProfilePDByFilial(@PathVariable Long id) {
         List<CostumerDepartment> purchasingDepartments = costumerDepartmentService.getAllByProfileCDId(id);
-        if (purchasingDepartments.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
-        }
         return ResponseEntity.ok(purchasingDepartments);
     }
 }

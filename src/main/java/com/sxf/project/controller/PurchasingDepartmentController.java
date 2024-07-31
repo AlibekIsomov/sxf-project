@@ -56,8 +56,8 @@ public class PurchasingDepartmentController {
 
 
     @GetMapping("/full-amount/{profilePDId}")
-    public ResponseEntity<Long> getTotalFullAmount(@PathVariable Long profilePDId) {
-        Long totalFullAmount = purchasingDepartmentService.getTotalFullAmountByProfilePD(profilePDId);
+    public ResponseEntity<Long> getTotalPayment(@PathVariable Long profilePDId) {
+        Long totalFullAmount = purchasingDepartmentService.getTotalPaymentByProfilePD(profilePDId);
         return ResponseEntity.ok(totalFullAmount);
     }
 
@@ -76,9 +76,6 @@ public class PurchasingDepartmentController {
     @GetMapping("/profilePD/{id}")
     public ResponseEntity<?> getProfilePDByFilial(@PathVariable Long id) {
         List<PurchasingDepartment> purchasingDepartments = purchasingDepartmentService.getAllByProfileDBId(id);
-        if (purchasingDepartments.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
-        }
         return ResponseEntity.ok(purchasingDepartments);
     }
 

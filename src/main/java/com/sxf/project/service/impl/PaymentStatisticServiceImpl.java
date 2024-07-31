@@ -15,6 +15,7 @@ import com.sxf.project.service.PaymentStatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -199,7 +200,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
 
     @Override
-    public List<PaymentStatisticDTO> getPaymentsFromToDate(Date fromDate, Date toDate) {
+    public List<PaymentStatisticDTO> getPaymentsFromToDate(Instant fromDate, Instant toDate) {
         List<PaymentStatisticDTO> payments = new ArrayList<>();
 
         // Retrieve and classify ReportPayments
@@ -230,7 +231,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         return payments;
     }
     @Override
-    public PaymentStatisticsResponseDTO getAllIncomeFromToDate(Date fromDate, Date toDate) {
+    public PaymentStatisticsResponseDTO getAllIncomeFromToDate(Instant fromDate, Instant toDate) {
         List<PaymentStatisticDTO> payments = new ArrayList<>();
         double totalIncome = 0.0;
 
@@ -250,7 +251,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
     }
 
     @Override
-    public PaymentStatisticsResponseDTO getAllOutcomeFromToDate(Date fromDate, Date toDate) {
+    public PaymentStatisticsResponseDTO getAllOutcomeFromToDate(Instant fromDate, Instant toDate) {
         List<PaymentStatisticDTO> payments = new ArrayList<>();
         double totalOutcome = 0.0;
 
@@ -280,7 +281,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
     }
 
     @Override
-    public List<PaymentStatisticDTO> getPaymentsByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate) {
+    public List<PaymentStatisticDTO> getPaymentsByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate) {
         List<PaymentStatisticDTO> payments = new ArrayList<>();
 
         // Retrieve and classify ReportPayments
@@ -312,7 +313,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
     }
 
     @Override
-    public PaymentStatisticsResponseDTO getAllIncomeByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate) {
+    public PaymentStatisticsResponseDTO getAllIncomeByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate) {
         List<PaymentStatisticDTO> payments = new ArrayList<>();
         double totalIncome = 0.0;
 
@@ -332,7 +333,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
     }
 
     @Override
-    public PaymentStatisticsResponseDTO getAllOutcomeByFilialIdFromToDate(Long filialId, Date fromDate, Date toDate) {
+    public PaymentStatisticsResponseDTO getAllOutcomeByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate) {
         List<PaymentStatisticDTO> payments = new ArrayList<>();
         double totalOutcome = 0.0;
 

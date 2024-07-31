@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -21,9 +22,9 @@ public interface ReportPaymentRepository extends JpaRepository<ReportPayment, Lo
     List<ReportPayment> findByFilialId(@Param("filialId") Long filialId);
 
     @Query("SELECT rp FROM ReportPayment rp WHERE rp.createdAt BETWEEN :fromDate AND :toDate")
-    List<ReportPayment> findByDateRange(@Param("fromDate") Date fromDate, @Param("toDate") Date toDate);
+    List<ReportPayment> findByDateRange(@Param("fromDate") Instant fromDate, @Param("toDate") Instant toDate);
 
     @Query("SELECT rp FROM ReportPayment rp JOIN rp.report r WHERE r.filial.id = :filialId AND rp.createdAt BETWEEN :fromDate AND :toDate")
-    List<ReportPayment> findByFilialIdAndDateRange(@Param("filialId") Long filialId, @Param("fromDate") Date fromDate, @Param("toDate") Date toDate);
+    List<ReportPayment> findByFilialIdAndDateRange(@Param("filialId") Long filialId, @Param("fromDate") Instant fromDate, @Param("toDate") Instant toDate);
 
 }

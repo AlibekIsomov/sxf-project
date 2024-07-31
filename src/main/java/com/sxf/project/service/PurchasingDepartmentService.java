@@ -25,7 +25,7 @@ public interface PurchasingDepartmentService {
 
     Page<PurchasingDepartment> getAllByNameContains(String name, Pageable pageable);
 
-    Long getTotalFullAmountByProfilePD(Long profilePDId);
+    Long getTotalPaymentByProfilePD(Long profilePDId);
 
     Long getRemainingPaymentByProfilePD(Long profilePDId);
 

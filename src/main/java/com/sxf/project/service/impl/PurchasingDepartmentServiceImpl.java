@@ -36,6 +36,9 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
 
     @Override
     public List<PurchasingDepartment> getAllByProfileDBId(Long id) {
+        if (!profilePDRepository.existsById(id)) {
+            throw new IllegalArgumentException("ProfileOD with id " + id + " does not exist");
+        }
         return purchasingDepartmentRepository.findAllByProfilePDId(id);
     }
 
@@ -153,10 +156,14 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
-    public Long getTotalFullAmountByProfilePD(Long profilePDId) {
-        PurchasingDepartment purchasingDepartment = purchasingDepartmentRepository.findById(profilePDId)
-                .orElseThrow(() -> new EntityNotFoundException("Report not found with id: " + profilePDId));
+    public Long getTotalPaymentByProfilePD(Long profilePDId) {
+        Optional<PurchasingDepartment> optionalPurchasingDepartment = purchasingDepartmentRepository.findById(profilePDId);
 
+        if (!optionalPurchasingDepartment.isPresent()) {
+            return null; // Return null if PurchasingDepartment is not found
+        }
+
+        PurchasingDepartment purchasingDepartment = optionalPurchasingDepartment.get();
         ProfilePD profilePD = purchasingDepartment.getProfilePD();
 
         return purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePD);
@@ -164,13 +171,18 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
 
     @Override
     public Long getRemainingPaymentByProfilePD(Long profilePDId) {
-        PurchasingDepartment purchasingDepartment = purchasingDepartmentRepository.findById(profilePDId)
-                .orElseThrow(() -> new EntityNotFoundException("Report not found for id: " + profilePDId));
+        Optional<PurchasingDepartment> optionalPurchasingDepartment = purchasingDepartmentRepository.findById(profilePDId);
+
+        if (!optionalPurchasingDepartment.isPresent()) {
+            return null;
+        }
+
+        PurchasingDepartment purchasingDepartment = optionalPurchasingDepartment.get();
 
         ProfilePD profilePD = purchasingDepartment.getProfilePD();
 
         Long totalAmount = purchasingDepartment.getFullAmount();
-        Long paidAmount = purchasingDepartmentRepository.calculateTotalFullAmountByProfilePD(profilePD);
+        Long paidAmount = purchasingDepartmentRepository.calculateTotalPayment(profilePD);
 
         return totalAmount - paidAmount;
     }
