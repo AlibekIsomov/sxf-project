@@ -133,7 +133,7 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
             return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
         }
 
-        CostumerDepartment costumerDepartment = buildCostumerDepartment(data, profileCD, optionalTypeOfUnit.get());
+        CostumerDepartment costumerDepartment = updateCostumerDepartment(data, optionalTypeOfUnit.get());
         costumerDepartmentRepository.save(costumerDepartment);
 
         return new ApiResponse("Jarayon muvaffaqiyatli bajarildi!", true, costumerDepartment);
@@ -210,6 +210,19 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
         costumerDepartment.setDescription(data.getDescription());
         costumerDepartment.setTypeOfUnit(typeOfUnit);
         costumerDepartment.setProfileCD(profileCD);
+
+        return costumerDepartment;
+    }
+
+    private CostumerDepartment updateCostumerDepartment(CostumerDepartmentDTO data, TypeOfUnit typeOfUnit) {
+        CostumerDepartment costumerDepartment = new CostumerDepartment();
+        costumerDepartment.setName(data.getName());
+        costumerDepartment.setPrice(data.getPrice());
+        costumerDepartment.setNumber(data.getNumber());
+        costumerDepartment.setPayment(data.getPayment());
+        costumerDepartment.setUnitOfMeasure(data.getUnitOfMeasure());
+        costumerDepartment.setDescription(data.getDescription());
+        costumerDepartment.setTypeOfUnit(typeOfUnit);
 
         return costumerDepartment;
     }

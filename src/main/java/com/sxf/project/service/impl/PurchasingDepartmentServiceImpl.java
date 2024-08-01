@@ -130,7 +130,6 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
         purchasingDepartment.setNumber(data.getNumber());
         purchasingDepartment.setPayment(data.getPayment());
         purchasingDepartment.setDescription(data.getDescription());
-        purchasingDepartment.setProfilePD(profilePD);
 
         PurchasingDepartment updatedPurchasingDepartment = purchasingDepartmentRepository.save(purchasingDepartment);
         return new ApiResponse("PurchasingDepartment muvaffaqiyatli yangilandi!", true, updatedPurchasingDepartment);
