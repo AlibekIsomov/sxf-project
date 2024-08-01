@@ -20,7 +20,7 @@ public interface CostumerDepartmentService {
 
     ApiResponse create(CostumerDepartmentDTO data, User currentUser) throws Exception;
 
-    ApiResponse update(Long id, CostumerDepartmentDTO data, User currentUser) throws Exception;
+    ApiResponse update(Long id, CostumerDepartmentDTO data, User currentUser);
 
     Page<CostumerDepartment> getAllByNameContains(String name, Pageable pageable);
 

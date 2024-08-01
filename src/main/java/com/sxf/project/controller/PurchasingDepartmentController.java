@@ -40,7 +40,7 @@ public class PurchasingDepartmentController {
     }
     @Transactional
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody PurchasingDepartmentDTO data, @CurrentUser User currentUser) throws Exception {
+    public ResponseEntity<?> create(@RequestBody PurchasingDepartmentDTO data, @CurrentUser User currentUser) {
             ApiResponse apiResponse = purchasingDepartmentService.create(data, currentUser);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
@@ -48,7 +48,7 @@ public class PurchasingDepartmentController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,
                                                        @RequestBody PurchasingDepartmentDTO data,
-                                                       @CurrentUser User currentUser) throws Exception {
+                                                       @CurrentUser User currentUser) {
             ApiResponse apiResponse = purchasingDepartmentService.update(id, data, currentUser);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }

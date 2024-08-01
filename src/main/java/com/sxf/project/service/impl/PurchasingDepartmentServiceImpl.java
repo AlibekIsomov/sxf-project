@@ -71,7 +71,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
-    public ApiResponse create(PurchasingDepartmentDTO data, User currentUser) throws Exception {
+    public ApiResponse create(PurchasingDepartmentDTO data, User currentUser) {
         Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
 
         if (optionalProfilePD.isEmpty()) {
@@ -100,7 +100,7 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
     }
 
     @Override
-    public ApiResponse update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception {
+    public ApiResponse update(Long id, PurchasingDepartmentDTO data, User currentUser) {
         Optional<PurchasingDepartment> optionalPurchasingDepartment = purchasingDepartmentRepository.findById(id);
 
         if (optionalPurchasingDepartment.isEmpty()) {
@@ -108,14 +108,8 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
             return new ApiResponse("Bunaqa Idlik PurchasingDepartment yo'q!", false);
         }
 
-        Optional<ProfilePD> optionalProfilePD = profilePDRepository.findById(data.getProfilePDId());
-
-        if (optionalProfilePD.isEmpty()) {
-            logger.info("Such ID ProfilePD does not exist!");
-            return new ApiResponse("Bunaqa Idlik ProfilePD yo'q!", false);
-        }
-
-        ProfilePD profilePD = optionalProfilePD.get();
+        PurchasingDepartment purchasingDepartment = optionalPurchasingDepartment.get();
+        ProfilePD profilePD = purchasingDepartment.getProfilePD();
         Filial profilePDFilial = profilePD.getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
@@ -123,7 +117,6 @@ public class PurchasingDepartmentServiceImpl implements PurchasingDepartmentServ
             return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
         }
 
-        PurchasingDepartment purchasingDepartment = optionalPurchasingDepartment.get();
         purchasingDepartment.setName(data.getName());
         purchasingDepartment.setPrice(data.getPrice());
         purchasingDepartment.setNumber(data.getNumber());

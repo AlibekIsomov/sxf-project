@@ -84,31 +84,21 @@ public class ReportPaymentServiceImpl implements ReportPaymentService {
 
         if (reportOptional.isPresent()) {
             Report report = reportOptional.get();
-            // Find the existing payment by ID
             Optional<ReportPayment> paymentOptional = report.getPayments().stream()
                     .filter(payment -> payment.getId().equals(reportPaymentId))
                     .findFirst();
 
             if (paymentOptional.isPresent()) {
                 ReportPayment existingPayment = paymentOptional.get();
-
-                // Update the existing payment
                 existingPayment.setNewPayment(newPayment);
-
-                // Update the store's lastPayment to the new payment
-//                report.setLastPayment(newPayment);
-
-                // Save the updated store (including the updated payment)
+//              report.setLastPayment(newPayment);
                 reportRepository.save(report);
 
-                // Convert and return the updated store as a DTO
                 return ResponseEntity.ok(existingPayment);
             } else {
-                // Handle the case where the specified payment ID is not found
                 return ResponseEntity.notFound().build();
             }
         } else {
-            // Handle the case where the specified store ID is not found
             return ResponseEntity.notFound().build();
         }
     }

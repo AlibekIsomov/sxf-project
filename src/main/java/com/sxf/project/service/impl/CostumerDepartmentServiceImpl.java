@@ -103,19 +103,12 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
     }
 
     @Override
-    public ApiResponse update(Long id, CostumerDepartmentDTO data, User currentUser) throws Exception {
+    public ApiResponse update(Long id, CostumerDepartmentDTO data, User currentUser) {
         Optional<CostumerDepartment> optionalCostumerDepartment = costumerDepartmentRepository.findById(id);
-
-        Optional<ProfileCD> optionalProfileCD = profileCDRepository.findById(data.getProfileCDId());
 
         Optional<TypeOfUnit> optionalTypeOfUnit = typeOfUnitRepository.findById(data.getTypeOfUnitId());
 
         if (optionalCostumerDepartment.isEmpty()) {
-            logger.info("Such ID filial does not exist!");
-            return new ApiResponse("Bunaqa Idlik ProfileCD yo'q!", false);
-        }
-
-        if (optionalProfileCD.isEmpty()) {
             logger.info("Such ID filial does not exist!");
             return new ApiResponse("Bunaqa Idlik ProfileCD yo'q!", false);
         }
@@ -125,7 +118,8 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
             return new ApiResponse("Bunaqa Idlik o'lchov turi yo'q!", false);
         }
 
-        ProfileCD profileCD = optionalProfileCD.get();
+        CostumerDepartment costumerDepartment = updateCostumerDepartment(data, optionalTypeOfUnit.get());
+        ProfileCD profileCD = costumerDepartment.getProfileCD();
         Filial filialCheck = profileCD.getFilial();
         Filial currentUserFilial = currentUser.getAssignedFilial();
 
@@ -133,7 +127,6 @@ public class CostumerDepartmentServiceImpl implements CostumerDepartmentService 
             return new ApiResponse("Siz uchun hech qanday filial ulanmagan!", false);
         }
 
-        CostumerDepartment costumerDepartment = updateCostumerDepartment(data, optionalTypeOfUnit.get());
         costumerDepartmentRepository.save(costumerDepartment);
 
         return new ApiResponse("Jarayon muvaffaqiyatli bajarildi!", true, costumerDepartment);

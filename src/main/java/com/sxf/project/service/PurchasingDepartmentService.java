@@ -17,9 +17,9 @@ public interface PurchasingDepartmentService {
 
     Optional<PurchasingDepartment> getById(Long id, User currentUser) throws Exception;
 
-    ApiResponse create(PurchasingDepartmentDTO data, User currentUser) throws Exception;
+    ApiResponse create(PurchasingDepartmentDTO data, User currentUser);
 
-    ApiResponse update(Long id, PurchasingDepartmentDTO data, User currentUser) throws Exception;
+    ApiResponse update(Long id, PurchasingDepartmentDTO data, User currentUser) ;
 
     Page<PurchasingDepartment> getAllByNameContains(String name, Pageable pageable);
 

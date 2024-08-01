@@ -48,7 +48,7 @@ public class CostumerDepartmentController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,
                                     @RequestBody CostumerDepartmentDTO data,
-                                    @CurrentUser User currentUser) throws Exception {
+                                    @CurrentUser User currentUser)  {
         ApiResponse apiResponse = costumerDepartmentService.update(id, data, currentUser);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
