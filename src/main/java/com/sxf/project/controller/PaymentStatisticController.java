@@ -72,16 +72,16 @@ public class PaymentStatisticController {
     @GetMapping("/incomeByFilialId")
     public PaymentStatisticsResponseDTO getAllIncomeFromToDateByFilialId(
             @RequestParam("filialId") Long filialId,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate){
         return paymentService.getAllIncomeByFilialIdFromToDate(filialId, fromDate, toDate);
     }
 
     @GetMapping("/outcomeByFilialId")
     public PaymentStatisticsResponseDTO getAllOutcomeFromToDateByFilialId(
             @RequestParam("filialId") Long filialId,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getAllOutcomeByFilialIdFromToDate(filialId, fromDate, toDate);
     }
 
@@ -90,8 +90,8 @@ public class PaymentStatisticController {
     @GetMapping("/payments/manager")
     public List<PaymentStatisticDTO> getPaymentsFromToDateByFilialId(
             @CurrentUser User currentUser,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         Filial assignedFilial = currentUser.getAssignedFilial();
         return paymentService.getPaymentsByFilialIdFromToDate(assignedFilial.getId(), fromDate, toDate);
     }
@@ -99,8 +99,8 @@ public class PaymentStatisticController {
     @GetMapping("/income/manager")
     public PaymentStatisticsResponseDTO getAllIncomeFromToDateByFilialId(
             @CurrentUser User currentUser,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate){
         Filial assignedFilial = currentUser.getAssignedFilial();
         return paymentService.getAllIncomeByFilialIdFromToDate(assignedFilial.getId(), fromDate, toDate);
     }
@@ -108,8 +108,8 @@ public class PaymentStatisticController {
     @GetMapping("/outcome/manager")
     public PaymentStatisticsResponseDTO getAllOutcomeFromToDateByFilialId(
             @CurrentUser User currentUser,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         Filial assignedFilial = currentUser.getAssignedFilial();
         return paymentService.getAllOutcomeByFilialIdFromToDate(assignedFilial.getId(), fromDate, toDate);
     }
@@ -118,8 +118,8 @@ public class PaymentStatisticController {
 
     @GetMapping
     public List<PaymentStatisticDTO> getPaymentsFromToDate(
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getPaymentsFromToDate(fromDate, toDate);
     }
 
@@ -132,8 +132,8 @@ public class PaymentStatisticController {
 
     @GetMapping("/outcome")
     public PaymentStatisticsResponseDTO getAllOutcomeFromToDate(
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getAllOutcomeFromToDate(fromDate, toDate);
     }
 }
