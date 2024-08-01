@@ -56,12 +56,8 @@ public class ProfileCDController {
     }
     @Transactional
     @GetMapping("/filial")
-    public ResponseEntity<?> getWorkersByFilial(@CurrentUser User currentUser) {
+    public ResponseEntity<?> getProfileCDByFilial(@CurrentUser User currentUser) {
         List<ProfileCD> profilePDS = profilePDService.getProfilePDByFilial(currentUser);
-        if (profilePDS.isEmpty()) {
-            return ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
-        }
-
         return ResponseEntity.ok(profilePDS);
     }
 

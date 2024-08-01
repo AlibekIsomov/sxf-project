@@ -201,6 +201,9 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
     @Override
     public List<PaymentStatisticDTO> getPaymentsFromToDate(Instant fromDate, Instant toDate) {
+        if (fromDate == null && toDate == null) {
+            return getPayments();
+        }
         List<PaymentStatisticDTO> payments = new ArrayList<>();
 
         // Retrieve and classify ReportPayments
@@ -233,6 +236,9 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
     @Override
     public PaymentStatisticsResponseDTO getAllIncomeFromToDate(Instant fromDate, Instant toDate) {
+        if (fromDate == null && toDate == null) {
+            return getAllIncome();
+        }
         List<PaymentStatisticDTO> payments = new ArrayList<>();
         double totalIncome = 0.0;
 
@@ -253,6 +259,9 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
     @Override
     public PaymentStatisticsResponseDTO getAllOutcomeFromToDate(Instant fromDate, Instant toDate) {
+        if (fromDate == null && toDate == null) {
+            return getAllOutcome();
+        }
         List<PaymentStatisticDTO> payments = new ArrayList<>();
         double totalOutcome = 0.0;
 
@@ -284,6 +293,9 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
     @Override
     public List<PaymentStatisticDTO> getPaymentsByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate) {
         List<PaymentStatisticDTO> payments = new ArrayList<>();
+        if (fromDate == null && toDate == null) {
+            return getPaymentsByFilialId(filialId);
+        }
 
         // Retrieve and classify ReportPayments
         List<ReportPayment> reportPayments = reportPaymentRepository.findByFilialIdAndDateRange(filialId, fromDate, toDate);
@@ -315,6 +327,9 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
     @Override
     public PaymentStatisticsResponseDTO getAllIncomeByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate) {
+        if (fromDate == null && toDate == null) {
+            return getIncomeByFilialId(filialId);
+        }
         List<PaymentStatisticDTO> payments = new ArrayList<>();
         double totalIncome = 0.0;
 
@@ -335,6 +350,9 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
     @Override
     public PaymentStatisticsResponseDTO getAllOutcomeByFilialIdFromToDate(Long filialId, Instant fromDate, Instant toDate) {
+        if (fromDate == null && toDate == null) {
+            return getOutcomeByFilialId(filialId);
+        }
         List<PaymentStatisticDTO> payments = new ArrayList<>();
         double totalOutcome = 0.0;
 

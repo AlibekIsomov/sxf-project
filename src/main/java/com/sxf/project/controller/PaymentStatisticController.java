@@ -64,8 +64,8 @@ public class PaymentStatisticController {
     @GetMapping("/paymentsByFilialId")
     public List<PaymentStatisticDTO> getPaymentsFromToDateByFilialId(
             @RequestParam("filialId") Long filialId,
-            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
-            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Instant toDate) {
         return paymentService.getPaymentsByFilialIdFromToDate(filialId, fromDate, toDate);
     }
 

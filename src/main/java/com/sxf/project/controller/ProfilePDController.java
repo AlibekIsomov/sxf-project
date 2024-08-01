@@ -58,12 +58,8 @@ public class ProfilePDController {
     }
     @Transactional
     @GetMapping("/filial")
-    public ResponseEntity<?> getWorkersByFilial(@CurrentUser User currentUser) {
+    public ResponseEntity<?> getProfilePDByFilial(@CurrentUser User currentUser) {
         List<ProfilePD> profilePDS = profilePDService.getProfilePDByFilial(currentUser);
-        if (profilePDS.isEmpty()) {
-            return ResponseEntity.badRequest().body("Siz uchun hech qanday filial bog'lanmagan!");
-        }
-
         return ResponseEntity.ok(profilePDS);
     }
 
@@ -95,6 +91,7 @@ public class ProfilePDController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(new InputStreamResource(in));
     }
+
     @Transactional
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id, @CurrentUser User currentUser) {

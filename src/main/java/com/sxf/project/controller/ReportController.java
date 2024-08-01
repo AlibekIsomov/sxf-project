@@ -59,9 +59,6 @@ public class ReportController {
     @GetMapping("/filial/{id}")
     public ResponseEntity<?> getWorkersByFilial(@PathVariable Long id) {
         List<Report> Report = reportService.getAllByFilial(id);
-        if (Report.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
-        }
         return ResponseEntity.ok(Report);
     }
 

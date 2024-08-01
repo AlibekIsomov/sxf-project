@@ -62,9 +62,6 @@ public class WorkerController {
     @GetMapping("/filial/{id}")
     public ResponseEntity<?> getWorkersByFilial(@PathVariable Long id) {
         List<Worker> workers = workerService.getAllByFilial(id);
-        if (workers.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bunaqa ID lik filal yo'q");
-        }
         return ResponseEntity.ok(workers);
     }
 
