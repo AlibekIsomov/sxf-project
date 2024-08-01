@@ -3,15 +3,12 @@ package com.sxf.project.security;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -23,17 +20,15 @@ public class JwtTokenUtil implements Serializable {
 
     @Value("${jwt.jwtExpirationInMs}")
     private long refreshTokenExpirationMs;
+    @Value("${accessTokenKey}")
+    private String accessTokenKey;
+    @Value("${refreshTokenKey}")
+    private String refreshTokenKey;
 
     @Value("${jwt.secret}")
     public void setSecret(String secret) {
         this.secret = secret;
     }
-
-    @Value("${accessTokenKey}")
-    private String accessTokenKey;
-
-    @Value("${refreshTokenKey}")
-    private String refreshTokenKey;
 
     @Value("${jwt.jwtExpirationInMs}")
     public void setJwtExpirationInMs(String jwtExpirationInMs) {
@@ -44,6 +39,7 @@ public class JwtTokenUtil implements Serializable {
     public void setJwtExpirationInMsRememberMe(String jwtExpirationInMsRememberME) {
         this.jwtExpirationInMsRememberMe = Integer.parseInt(jwtExpirationInMsRememberME);
     }
+
     public String generateToken(UserDetails userDetails, boolean rememberMe) {
         Map<String, Object> claims = new HashMap<>();
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
@@ -51,8 +47,8 @@ public class JwtTokenUtil implements Serializable {
 
 // TODO ROLE bilan boshlanishni hal qilish zarur bu vaqtinchalik
         claims.put("roles", roles.stream().map(e -> {
-            String r = e.getAuthority().toString();
-            return r.substring(r.indexOf("_")+1);
+            String r = e.getAuthority();
+            return r.substring(r.indexOf("_") + 1);
         }).toArray());
 
 
@@ -65,7 +61,7 @@ public class JwtTokenUtil implements Serializable {
     }
     // generate token for user
 
-    public String generateAccessToken(String username){
+    public String generateAccessToken(String username) {
         Date expireDate = new Date(System.currentTimeMillis() + secret);
 
         return Jwts
@@ -77,7 +73,7 @@ public class JwtTokenUtil implements Serializable {
                 .compact();
     }
 
-    public String generateRefreshToken(String username, UUID refreshTokenId){
+    public String generateRefreshToken(String username, UUID refreshTokenId) {
         Date expireDate = new Date(System.currentTimeMillis() + refreshTokenExpirationMs);
         return Jwts
                 .builder()
@@ -85,19 +81,19 @@ public class JwtTokenUtil implements Serializable {
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, refreshTokenKey)
-                .claim("tokenId",refreshTokenId.toString())
+                .claim("tokenId", refreshTokenId.toString())
                 .compact();
     }
 
-    public boolean validateAccessToken(String token){
-        return validateToken(token,secret);
+    public boolean validateAccessToken(String token) {
+        return validateToken(token, secret);
     }
 
-    public boolean validateRefreshToken(String token){
-        return validateToken(token,refreshTokenKey);
+    public boolean validateRefreshToken(String token) {
+        return validateToken(token, refreshTokenKey);
     }
 
-    private boolean validateToken(String token,String key){
+    private boolean validateToken(String token, String key) {
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             return true;
@@ -115,21 +111,20 @@ public class JwtTokenUtil implements Serializable {
         return false;
     }
 
-    public String getUsernameFromAccessToken(String token){
+    public String getUsernameFromAccessToken(String token) {
         return Jwts
                 .parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String getUsernameFromRefreshToken(String token){
+    public String getUsernameFromRefreshToken(String token) {
         return Jwts
                 .parser().setSigningKey(refreshTokenKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public UUID getRefreshTokenIdFromRefreshToken(String token){
+    public UUID getRefreshTokenIdFromRefreshToken(String token) {
         log.info(Jwts.parser().setSigningKey(refreshTokenKey).parseClaimsJws(token).getBody().get("tokenId").toString());
         return UUID.fromString(Jwts.parser().setSigningKey(refreshTokenKey).parseClaimsJws(token).getBody().get("tokenId").toString());
     }
-
 
 
 }

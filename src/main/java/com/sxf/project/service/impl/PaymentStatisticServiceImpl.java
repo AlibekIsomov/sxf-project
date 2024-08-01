@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -51,7 +50,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
         List<PurchasingDepartment> purchases = purchasingDepartmentRepository.findByFilialId(filialId);
         for (PurchasingDepartment purchase : purchases) {
             String entityName = purchase.getName();
-            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName,purchase.getCreatedAt());
+            PaymentStatisticDTO paymentDTO = new PaymentStatisticDTO(purchase.getId(), purchase.getPayment(), "outcome", "PurchasingDepartment", entityName, purchase.getCreatedAt());
             payments.add(paymentDTO);
         }
 
@@ -66,6 +65,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
         return payments;
     }
+
     @Override
     public List<PaymentStatisticDTO> getPayments() {
         List<PaymentStatisticDTO> payments = new ArrayList<>();
@@ -230,6 +230,7 @@ public class PaymentStatisticServiceImpl implements PaymentStatisticService {
 
         return payments;
     }
+
     @Override
     public PaymentStatisticsResponseDTO getAllIncomeFromToDate(Instant fromDate, Instant toDate) {
         List<PaymentStatisticDTO> payments = new ArrayList<>();

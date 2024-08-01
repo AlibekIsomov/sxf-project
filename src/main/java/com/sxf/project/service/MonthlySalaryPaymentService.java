@@ -6,7 +6,6 @@ import com.sxf.project.entity.User;
 import com.sxf.project.payload.ApiResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface MonthlySalaryPaymentService {
 

@@ -60,6 +60,6 @@ public class UserController extends AbstractDTOController<User, UserDTO> {
         User savedUser = userRepository.save(existingUser);
         return ResponseEntity.ok(savedUser);
     }
-   
+
 
 }

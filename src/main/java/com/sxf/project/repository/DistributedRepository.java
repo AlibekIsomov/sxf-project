@@ -7,5 +7,5 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface DistributedRepository<ENTITY> extends JpaRepository<ENTITY, Long> {
-    public Page<ENTITY> findAllByOrderByIdDesc(Pageable pageable);
+    Page<ENTITY> findAllByOrderByIdDesc(Pageable pageable);
 }

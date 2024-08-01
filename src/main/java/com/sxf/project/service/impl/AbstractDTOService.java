@@ -13,12 +13,12 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 
-public abstract class AbstractDTOService<ENTITY extends DistributedEntity, DTO extends BaseDTO> implements CommonServiceDto<ENTITY,DTO> {
-    
+public abstract class AbstractDTOService<ENTITY extends DistributedEntity, DTO extends BaseDTO> implements CommonServiceDto<ENTITY, DTO> {
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractDTOService.class);
 
-    private DistributedRepository<ENTITY> repository;
-    private AbstractDTOConverter<ENTITY, DTO> converter;
+    private final DistributedRepository<ENTITY> repository;
+    private final AbstractDTOConverter<ENTITY, DTO> converter;
 
 
     public AbstractDTOService(DistributedRepository<ENTITY> repository, AbstractDTOConverter<ENTITY, DTO> converter) {
@@ -30,7 +30,7 @@ public abstract class AbstractDTOService<ENTITY extends DistributedEntity, DTO e
     public Page<DTO> getAll(Pageable pageable) {
         Page<ENTITY> entity = repository.findAll(pageable);
 
-        if(entity.isEmpty()){
+        if (entity.isEmpty()) {
             return Page.empty();
         }
 
@@ -38,8 +38,8 @@ public abstract class AbstractDTOService<ENTITY extends DistributedEntity, DTO e
     }
 
     @Override
-    public DTO create(ENTITY entity) throws Exception{
-        if(entity.isNewEntity()){
+    public DTO create(ENTITY entity) throws Exception {
+        if (entity.isNewEntity()) {
             entity.setCreated(LocalDateTime.now());
             entity.setModified(LocalDateTime.now());
             someChangesForCreate(entity);
@@ -47,35 +47,35 @@ public abstract class AbstractDTOService<ENTITY extends DistributedEntity, DTO e
             repository.save(entity);
 
             return converter.convert(entity);
-        }
-        else{
+        } else {
             LOG.error("Failed to save the entity of class '{}', Id should be null", entity.getClass());
             return null;
         }
     }
 
     /**
-     * @return tanasini yozishingiz majburiy emas agar uzgarishlaringiz bulmasa FUNKSIYA TANASINI OCHIQ QOLDIRING
      * @param entity kiruvchi entity bu uzgartishingiz kerak bulgan entity;
+     * @return tanasini yozishingiz majburiy emas agar uzgarishlaringiz bulmasa FUNKSIYA TANASINI OCHIQ QOLDIRING
      */
     public abstract void someChangesForCreate(ENTITY entity);
+
     /**
      * tanasini yozishingiz majburiy emas agar uzgarishlaringiz bulmasa FUNKSIYA TANASINI OCHIQ QOLDIRING
+     *
      * @param entity kiruvchi entity bu uzgartishingiz kerak bulgan entity;
      */
     public abstract void someChangesForUpdate(ENTITY entity);
 
     @Override
     public DTO update(ENTITY entity) {
-        if(!entity.isNewEntity()){
+        if (!entity.isNewEntity()) {
             entity.setCreated(LocalDateTime.now());
             entity.setModified(LocalDateTime.now());
             someChangesForUpdate(entity);
             repository.save(entity);
 
             return converter.convert(entity);
-        }
-        else{
+        } else {
             LOG.error("Failed to save the entity of class '{}', Id shouldn't be null", entity.getClass());
             return null;
         }

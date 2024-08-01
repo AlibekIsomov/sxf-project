@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/monthlySalary")
@@ -65,7 +64,7 @@ public class MonthlySalaryController {
 
     @GetMapping("/worker/{workerId}")
     public List<MonthlySalary> getMonthlySalariesByWorkerId(@PathVariable Long workerId,
-                                                            @CurrentUser User currentUser) throws Exception {
+                                                            @CurrentUser User currentUser) {
         return monthlySalaryService.getMonthlySalariesByWorkerId(workerId, currentUser);
     }
 }

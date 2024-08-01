@@ -6,7 +6,6 @@ import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.ProfilePDRepository;
 import com.sxf.project.repository.PurchasingDepartmentRepository;
 import com.sxf.project.service.PurchasingDepartmentService;
-import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

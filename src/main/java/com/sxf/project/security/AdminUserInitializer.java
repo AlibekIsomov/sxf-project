@@ -1,7 +1,6 @@
 package com.sxf.project.security;
 
 
-
 import com.sxf.project.entity.Role;
 import com.sxf.project.entity.User;
 import com.sxf.project.repository.UserRepository;
@@ -11,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Component
 public class AdminUserInitializer implements CommandLineRunner {

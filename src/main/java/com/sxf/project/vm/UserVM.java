@@ -1,8 +1,8 @@
- package com.sxf.project.vm;
+package com.sxf.project.vm;
 
- import lombok.Data;
+import lombok.Data;
 
- @Data
+@Data
 public class UserVM {
 
     private String username;

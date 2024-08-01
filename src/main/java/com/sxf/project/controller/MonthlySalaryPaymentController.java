@@ -8,13 +8,10 @@ import com.sxf.project.repository.MonthlySalaryPaymentRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.MonthlySalaryPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/monthlySalaryPayment")

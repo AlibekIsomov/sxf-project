@@ -1,6 +1,5 @@
 package com.sxf.project.payload;
 
-import com.sxf.project.entity.Filial;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,7 @@ public class ApiResponse {
         this.success = success;
     }
 
-    public ApiResponse(Object data,boolean success) {
+    public ApiResponse(Object data, boolean success) {
         this.success = success;
         this.data = data;
     }

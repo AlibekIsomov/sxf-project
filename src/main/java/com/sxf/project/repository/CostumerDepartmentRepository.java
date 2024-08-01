@@ -2,7 +2,6 @@ package com.sxf.project.repository;
 
 import com.sxf.project.entity.CostumerDepartment;
 import com.sxf.project.entity.ProfileCD;
-import com.sxf.project.entity.ProfilePD;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

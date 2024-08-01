@@ -1,15 +1,13 @@
 package com.sxf.project.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -25,7 +23,7 @@ import java.util.Collections;
 @Builder
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 @Data
-public class User extends DistributedEntity  implements UserDetails, Serializable {
+public class User extends DistributedEntity implements UserDetails, Serializable {
 
     @Column(nullable = false)
     private String name;
@@ -61,7 +59,6 @@ public class User extends DistributedEntity  implements UserDetails, Serializabl
         this.phoneNumber = phoneNumber;
         this.assignedFilial = assignedFilial;
     }
-
 
 
     @Override

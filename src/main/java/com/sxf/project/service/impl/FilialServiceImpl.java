@@ -3,7 +3,10 @@ package com.sxf.project.service.impl;
 
 import com.sxf.project.dto.FilialDTO;
 import com.sxf.project.dto.UserDTO;
-import com.sxf.project.entity.*;
+import com.sxf.project.entity.FileEntity;
+import com.sxf.project.entity.Filial;
+import com.sxf.project.entity.Role;
+import com.sxf.project.entity.User;
 import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.FileRepository;
 import com.sxf.project.repository.FilialRepository;
@@ -194,7 +197,7 @@ public class FilialServiceImpl implements FilialService {
 
     @Override
     @Transactional
-    public FilialDTO    assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException {
+    public FilialDTO assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException {
         Filial filial = filialRepository.findByIdWithManagers(filialId)
                 .orElseThrow(() -> new ResourceNotFoundException("Filial not found"));
         User manager = userRepository.findById(managerId)

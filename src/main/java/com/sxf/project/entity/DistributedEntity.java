@@ -1,11 +1,14 @@
 package com.sxf.project.entity;
 
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -16,7 +19,7 @@ public abstract class DistributedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-//    @JsonFormat(pattern = "yyyy.MM.dd.HH.mm")
+    //    @JsonFormat(pattern = "yyyy.MM.dd.HH.mm")
 //    @DateTimeFormat(pattern = "yyyy.MM.dd.HH.mm")
 //    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
 //    @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -25,7 +28,6 @@ public abstract class DistributedEntity {
     private LocalDateTime modified;
 
     private LocalDateTime created;
-
 
 
     public boolean isNewEntity() {

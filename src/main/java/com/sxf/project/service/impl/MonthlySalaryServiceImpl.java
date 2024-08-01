@@ -144,7 +144,6 @@ public class MonthlySalaryServiceImpl implements MonthlySalaryService {
     }
 
 
-
     @Override
     public Page<MonthlySalary> getAll(Pageable pageable) throws Exception {
         return monthlySalaryRepository.findAll(pageable);

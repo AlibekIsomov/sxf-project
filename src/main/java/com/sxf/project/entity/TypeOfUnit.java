@@ -18,6 +18,6 @@ public class TypeOfUnit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200, unique=true)
+    @Column(nullable = false, length = 200, unique = true)
     private String name;
 }

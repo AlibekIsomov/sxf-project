@@ -16,7 +16,7 @@ public abstract class AbstractDTOController<ENTITY extends DistributedEntity, DT
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll(Pageable pageable){
+    public ResponseEntity<?> getAll(Pageable pageable) {
         return ResponseEntity.ok(service.getAll(pageable));
     }
 
@@ -31,15 +31,15 @@ public abstract class AbstractDTOController<ENTITY extends DistributedEntity, DT
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id){
-        if(service.delete(id)){
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        if (service.delete(id)) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id){
+    public ResponseEntity<?> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 

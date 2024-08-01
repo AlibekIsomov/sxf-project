@@ -4,12 +4,9 @@ import com.sxf.project.dto.PaymentStatisticDTO;
 import com.sxf.project.dto.PaymentStatisticsResponseDTO;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 public interface PaymentStatisticService {
-
-
     List<PaymentStatisticDTO> getPaymentsByFilialId(Long filialId);
 
     List<PaymentStatisticDTO> getPayments();

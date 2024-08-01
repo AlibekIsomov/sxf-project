@@ -1,7 +1,6 @@
 package com.sxf.project.service;
 
 import com.sxf.project.dto.PurchasingDepartmentDTO;
-import com.sxf.project.entity.ProfilePD;
 import com.sxf.project.entity.PurchasingDepartment;
 import com.sxf.project.entity.User;
 import com.sxf.project.payload.ApiResponse;
@@ -17,7 +16,6 @@ public interface PurchasingDepartmentService {
     List<PurchasingDepartment> getAllByProfileDBId(Long id);
 
     Optional<PurchasingDepartment> getById(Long id, User currentUser) throws Exception;
-
 
     ApiResponse create(PurchasingDepartmentDTO data, User currentUser) throws Exception;
 

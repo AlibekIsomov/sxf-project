@@ -1,24 +1,18 @@
 package com.sxf.project.security;
 
 import com.sxf.project.entity.User;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
 
 @Component
 public class JWTFilter extends OncePerRequestFilter {
@@ -37,23 +31,22 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
         String token = request.getHeader("Authorization");
-        if(token!=null && token.startsWith("Bearer") && !request.getRequestURI().startsWith("/api/auth/")){
-            token=token.substring(7);
+        if (token != null && token.startsWith("Bearer") && !request.getRequestURI().startsWith("/api/auth/")) {
+            token = token.substring(7);
             boolean validateToken = jwtTokenUtil.validateAccessToken(token);
-            if(validateToken){
+            if (validateToken) {
                 String username = jwtTokenUtil.getUsernameFromAccessToken(token);
                 UserDetails userDetails = authService.loadUserByUsername(username);
-                User user = (User) authService.loadUserByUsername(username);
+                User user = authService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-            else {
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 
 
