@@ -52,7 +52,7 @@ public class ProfileCDServiceImpl implements ProfileCDService {
     }
 
     @Override
-    public List<ProfileCD> getProfilePDByFilial(User user) {
+    public List<ProfileCD> getProfileCDByFilial(User user) {
         if (user.getAssignedFilial() != null && user.getAssignedFilial().getId() != null) {
             return profileCDRepository.findAllByFilialId(user.getAssignedFilial().getId());
         } else {

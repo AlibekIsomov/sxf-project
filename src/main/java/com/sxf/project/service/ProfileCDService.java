@@ -17,7 +17,7 @@ public interface ProfileCDService {
 
     List<ProfileCD> getAllByFilial(Long id);
 
-    List<ProfileCD> getProfilePDByFilial(User user);
+    List<ProfileCD> getProfileCDByFilial(User user);
 
     Optional<ProfileCD> getById(Long id, User currentUser) throws Exception;
 

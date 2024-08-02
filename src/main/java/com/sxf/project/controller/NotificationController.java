@@ -1,67 +1,71 @@
 package com.sxf.project.controller;
 
 import com.sxf.project.dto.NotificationDTO;
+import com.sxf.project.dto.NotificationUpdateDTO;
+import com.sxf.project.entity.Filial;
 import com.sxf.project.entity.Notification;
+import com.sxf.project.entity.NotificationUser;
+import com.sxf.project.entity.User;
 import com.sxf.project.payload.ApiResponse;
+import com.sxf.project.payload.NotificationResponse;
+import com.sxf.project.repository.NotificationRepository;
+import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.NotificationService;
+import com.sxf.project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/api/notifications")
 public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
 
-    @PostMapping("/all")
-    public ResponseEntity<?> postNotificationToAllUsers(@RequestBody NotificationDTO notificationDTO) {
-        notificationService.postNotificationToAllUsers(notificationDTO);
-        return ResponseEntity.ok(new ApiResponse("Notification sent to all users",true, null));
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public HttpEntity<?> postNotification(@RequestBody NotificationDTO notificationDTO) {
+       ApiResponse apiResponse = notificationService.createNotification(notificationDTO);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
-    @PostMapping("/user/{userId}")
-    public ResponseEntity<?> postNotificationToOneUser(@PathVariable Long userId, @RequestBody NotificationDTO notificationDTO) {
-        try {
-            Notification notification = notificationService.postNotificationToOneUser(userId, notificationDTO);
-            return ResponseEntity.ok(new ApiResponse("Notification sent to user",true, notification));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage(),false, null));
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateNotification(@PathVariable Long id, @RequestBody NotificationUpdateDTO notificationDTO) {
+        ApiResponse apiResponse = notificationService.updateNotification(id, notificationDTO);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
-    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
     public ResponseEntity<?> getAllNotifications() {
-        List<Notification> notifications = notificationService.getAllNotifications();
+        List<NotificationResponse> notifications = notificationService.getAllNotifications();
         return ResponseEntity.ok(new ApiResponse( "All notifications",true, notifications));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getNotificationsForUser(@PathVariable Long userId) {
-        try {
-            List<Notification> notifications = notificationService.getNotificationsForUser(userId);
-            return ResponseEntity.ok(new ApiResponse( "User notifications",true, notifications));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage(),false, null));
-        }
+    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping
+    public ResponseEntity<?> getNotificationsForUser(@CurrentUser User user) throws Exception {
+        List<NotificationUser> notifications = notificationService.getNotificationsForUser(user.getId());
+        return ResponseEntity.ok(new ApiResponse( "User notifications",true, notifications));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateNotification(@PathVariable Long id, @RequestBody NotificationDTO notificationDTO) {
-        try {
-            Notification notification = notificationService.updateNotification(id, notificationDTO);
-            return ResponseEntity.ok(new ApiResponse( "Notification updated",true, notification));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse( e.getMessage(),false, null));
-        }
-    }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
-        return ResponseEntity.ok(new ApiResponse("Notification deleted",true, null));
+        Optional<Notification> optionalNotification = notificationRepository.findById(id);
+        Notification notification = optionalNotification.get();
+        return ResponseEntity.ok(new ApiResponse("Notification deleted",true, notification));
     }
 }

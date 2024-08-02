@@ -1,22 +1,24 @@
 package com.sxf.project.service;
 
 import com.sxf.project.dto.NotificationDTO;
+import com.sxf.project.dto.NotificationUpdateDTO;
 import com.sxf.project.entity.Notification;
+import com.sxf.project.entity.NotificationUser;
+import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
+import com.sxf.project.payload.NotificationResponse;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface NotificationService {
-    @Transactional
-    void postNotificationToAllUsers(NotificationDTO notificationDTO);
+    ApiResponse createNotification(NotificationDTO notificationDTO);
 
-    Notification postNotificationToOneUser(Long userId, NotificationDTO notificationDTO) throws Exception;
+    List<NotificationResponse> getAllNotifications();
 
-    List<Notification> getAllNotifications();
+    List<NotificationUser> getNotificationsForUser(Long userId) throws Exception;
 
-    List<Notification> getNotificationsForUser(Long userId) throws Exception;
+    ApiResponse updateNotification(Long id, NotificationUpdateDTO notificationDTO);
 
-    Notification updateNotification(Long id, NotificationDTO notificationDTO) throws Exception;
-
-    void deleteNotification(Long id);
+    ApiResponse deleteNotification(Long id);
 }
