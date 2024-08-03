@@ -59,6 +59,11 @@ public class NotificationController {
         return ResponseEntity.ok(new ApiResponse( "User notifications",true, notifications));
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> countUnreadNotifications(@CurrentUser User user) {
+        long count = notificationService.countUnreadNotifications(user.getId());
+        return ResponseEntity.ok(count);
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")

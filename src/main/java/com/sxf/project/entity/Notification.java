@@ -2,6 +2,7 @@ package com.sxf.project.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -31,6 +32,7 @@ public class Notification {
     private String title;
     private String message;
 
+    @JsonIgnore
     @OneToMany(mappedBy="notification", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<NotificationUser> userList;

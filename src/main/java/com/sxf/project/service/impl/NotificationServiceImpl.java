@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -47,14 +46,15 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setMessage(notificationDTO.getMessage());
         notification.setStatus(NotificationStatus.UNREAD);
 
+        NotificationUser notificationUser = new NotificationUser();
+
         for (User user : userList) {
-            NotificationUser notificationUser = new NotificationUser();
             notificationUser.setUser(user);
             notificationUser.setNotification(notification);
             notificationUserRepository.save(notificationUser);
-        }
 
-        return new ApiResponse("Bildirishonomalar muvaffaqiyatli yuborildi!", true);
+        }
+        return new ApiResponse("Bildirishonomalar muvaffaqiyatli yuborildi!", true, notificationUser);
     }
 
 
@@ -97,6 +97,12 @@ public class NotificationServiceImpl implements NotificationService {
            notificationRepository.save(notification);
        }
        return notificationUserList;
+    }
+
+
+    @Override
+    public long countUnreadNotifications(Long userId) {
+        return notificationUserRepository.countByUserIdAndNotification_Status(userId, NotificationStatus.UNREAD);
     }
 
     @Override
