@@ -197,7 +197,7 @@ public class FilialServiceImpl implements FilialService {
 
     @Override
     @Transactional
-    public FilialDTO assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException {
+    public ApiResponse assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException {
         Filial filial = filialRepository.findByIdWithManagers(filialId)
                 .orElseThrow(() -> new ResourceNotFoundException("Filial not found"));
         User manager = userRepository.findById(managerId)
@@ -207,24 +207,22 @@ public class FilialServiceImpl implements FilialService {
             throw new AccessDeniedException("Access is denied");
         }
 
-        // Unassign the manager from any existing filial if necessary
         if (manager.getAssignedFilial() != null) {
             manager.getAssignedFilial().getManagers().remove(manager);
         }
 
-        // Assign the manager to the new filial and update the relationship
         manager.setAssignedFilial(filial);
         filial.getManagers().add(manager);
 
-        userRepository.save(manager); // Save the manager
-        filialRepository.save(filial); // Save the filial
+        userRepository.save(manager);
+        filialRepository.save(filial);
 
-        return convertToDTO(filial);
+        return new ApiResponse("Muvaffaqiyatli menejer qo'shildi", true, filial);
     }
 
     @Override
     @Transactional
-    public FilialDTO unassignFilialFromManager(Long managerId) throws AccessDeniedException {
+    public ApiResponse unassignFilialFromManager(Long managerId) throws AccessDeniedException {
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -244,7 +242,7 @@ public class FilialServiceImpl implements FilialService {
         userRepository.save(manager); // Save the manager
         filialRepository.save(assignedFilial); // Save the filial
 
-        return convertToDTO(assignedFilial);
+        return new ApiResponse("Muvaffaqiyatli menejer qo'shildi", true, assignedFilial);
     }
 
     private FilialDTO convertToDTO(Filial filial) {

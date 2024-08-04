@@ -18,8 +18,9 @@ public class ApiResponse {
         this.success = success;
     }
 
-    public ApiResponse(Object data, boolean success) {
+    public  ApiResponse(Object data, boolean success) {
         this.success = success;
         this.data = data;
     }
+
 }

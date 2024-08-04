@@ -38,8 +38,8 @@ public interface FilialService {
     List<Filial> getAllFilialsForAdmin(Long adminId) throws AccessDeniedException;
 
 
-    FilialDTO assignFilialToManager(Long filialId, Long managerId) throws AccessDeniedException;
+    ApiResponse assignFilialToManager(Long filialId, Long managerId) ;
 
     @Transactional
-    FilialDTO unassignFilialFromManager(Long managerId) throws FilialServiceImpl.AccessDeniedException;
+    ApiResponse unassignFilialFromManager(Long managerId) throws FilialServiceImpl.AccessDeniedException;
 }

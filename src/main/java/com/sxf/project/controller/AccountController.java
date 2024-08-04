@@ -3,6 +3,7 @@ package com.sxf.project.controller;
 
 import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.UserRepository;
 import com.sxf.project.security.JwtTokenUtil;
 import com.sxf.project.security.Token;
@@ -11,7 +12,9 @@ import com.sxf.project.security.UserSpecial;
 import com.sxf.project.service.UserService;
 import com.sxf.project.vm.UserVM;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -39,41 +42,37 @@ public class AccountController {
     private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/authenticate")
-    public ResponseEntity<Token> login(@RequestBody UserSpecial userSpecial) throws Exception {
+    public ResponseEntity<?> login(@RequestBody UserSpecial userSpecial) {
         try {
-            // Authenticate user using authenticationManager
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     userSpecial.getUsername(), userSpecial.getPassword()));
-
         } catch (DisabledException e) {
-            // Handle if user is disabled
-            throw new Exception("USER_DISABLED", e);
-
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse("Akkaount o'chirilgan!", false));
         } catch (BadCredentialsException e) {
-            // Handle if credentials are invalid
-            throw new Exception("INVALID_CREDENTIALS", e);
-
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse("Login yoki parol xato!", false));
         } catch (Exception ex) {
-            // Catch any other exceptions
             ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse("Jiddiy muammo bo'ldi!", false));
         }
 
-        // If authentication is successful, load UserDetails
         UserDetails userDetails = userProvider.loadUserByUsername(userSpecial.getUsername());
 
-        // Generate JWT token
         String token = jwtTokenUtil.generateToken(userDetails, true);
 
-        // Return ResponseEntity with JWT token in body
-        return ResponseEntity.ok(new Token(token));
+        return ResponseEntity.ok(new ApiResponse("Muvaffaqiyatli kirildi!", true, token));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register")
     public ResponseEntity<UserDTO> register(@RequestBody User user) throws Exception {
         if (user.getId() != null)
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(userService.create(user));
     }
+
 
     @GetMapping("/current-user")
     public ResponseEntity<UserDTO> getCurrentUser() {
@@ -84,7 +83,7 @@ public class AccountController {
         return ResponseEntity.ok(user);
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PutMapping("/password")
     public ResponseEntity<?> updatePassword(@RequestBody UserVM vm) {
 

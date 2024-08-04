@@ -5,6 +5,7 @@ import com.sxf.project.converter.AbstractDTOConverter;
 import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.Role;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.DistributedRepository;
 import com.sxf.project.repository.UserRepository;
 import com.sxf.project.service.UserService;
@@ -56,6 +57,27 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
         } else {
             return false;
         }
+    }
+    @Override
+    public ApiResponse updateUser(Long id, User user){
+        User existingUser = userRepository.findById(id).orElse(null);
+        if (existingUser == null) {
+            return new ApiResponse("Bunaqa idlik user yo'q" , false);
+        }
+
+        // Update fields other than password
+        existingUser.setName(user.getName());
+        existingUser.setSurname(user.getSurname());
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPhoneNumber(user.getPhoneNumber());
+        existingUser.setRoles(user.getRoles());
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(encoder.encode(user.getPassword()));
+        }
+
+        User savedUser = userRepository.save(existingUser);
+        return new ApiResponse("User muvaffaqiyatli yangilandi" , true, savedUser);
     }
 
     @Override

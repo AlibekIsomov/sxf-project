@@ -93,26 +93,16 @@ public class FilialController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{filialId}/assign-manager/{managerId}")
-    public ResponseEntity<FilialDTO> assignFilialToManager(@PathVariable Long filialId, @PathVariable Long managerId) {
-        try {
-            FilialDTO filialDTO = filialService.assignFilialToManager(filialId, managerId);
-            return ResponseEntity.ok(filialDTO);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.status(403).body(null);
-        }
+    public ResponseEntity<?> assignFilialToManager(@PathVariable Long filialId, @PathVariable Long managerId) {
+        ApiResponse apiResponse = filialService.assignFilialToManager(filialId ,managerId);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{managerId}/unassign")
-    public ResponseEntity<FilialDTO> unassignFilialFromManager(@PathVariable Long managerId) {
-        try {
-            FilialDTO filialDTO = filialService.unassignFilialFromManager(managerId);
-            return new ResponseEntity<>(filialDTO, HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<?> unassignFilialFromManager(@PathVariable Long managerId) {
+        ApiResponse apiResponse = filialService.unassignFilialFromManager(managerId);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
 
