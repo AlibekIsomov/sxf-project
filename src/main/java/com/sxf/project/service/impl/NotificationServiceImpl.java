@@ -44,9 +44,9 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = new Notification();
         notification.setTitle(notificationDTO.getTitle());
         notification.setMessage(notificationDTO.getMessage());
-        notification.setStatus(NotificationStatus.UNREAD);
 
         NotificationUser notificationUser = new NotificationUser();
+        notificationUser.setStatus(NotificationStatus.UNREAD);
 
         for (User user : userList) {
             notificationUser.setUser(user);
@@ -93,7 +93,7 @@ public class NotificationServiceImpl implements NotificationService {
        List<NotificationUser> notificationUserList = notificationUserRepository.findAllByUserId(userId);
        for (NotificationUser notificationUser : notificationUserList) {
            Notification notification = notificationUser.getNotification();
-           notification.setStatus(NotificationStatus.READ);
+           notificationUser.setStatus(NotificationStatus.READ);
            notificationRepository.save(notification);
        }
        return notificationUserList;
@@ -102,7 +102,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public long countUnreadNotifications(Long userId) {
-        return notificationUserRepository.countByUserIdAndNotification_Status(userId, NotificationStatus.UNREAD);
+        return notificationUserRepository.countByUserIdAndStatus(userId, NotificationStatus.UNREAD);
     }
 
     @Override

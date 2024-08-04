@@ -37,7 +37,6 @@ public class Notification {
     @JsonManagedReference
     private List<NotificationUser> userList;
 
-    private NotificationStatus status;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

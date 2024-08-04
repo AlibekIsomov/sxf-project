@@ -21,6 +21,8 @@ public class NotificationUser {
     @ManyToOne(cascade = CascadeType.ALL)
     private Notification notification;
 
+    private NotificationStatus status;
+
     @ManyToOne
     private User user;
 }
