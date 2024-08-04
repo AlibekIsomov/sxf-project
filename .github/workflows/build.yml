@@ -25,7 +25,7 @@ jobs:
       - name: Archive JAR
         uses: actions/upload-artifact@v2
         with:
-          name: inventory-jar
+          name: inventory
           path: target/inventory.jar  # Update this path if your JAR has a different name
 
   deploy:
@@ -36,7 +36,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: inventory-jar
+          name: inventory
 
       - name: Deploy to server
         env:
@@ -44,5 +44,5 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
         run: |
-          scp -o StrictHostKeyChecking=no my-app-jar.jar $USERNAME@$SERVER:/path/to/deploy
+          scp -o StrictHostKeyChecking=no inventory.jar $USERNAME@$SERVER:/root
           ssh $USERNAME@$SERVER 'supervisorctl restart my-programm'
