@@ -45,16 +45,18 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setTitle(notificationDTO.getTitle());
         notification.setMessage(notificationDTO.getMessage());
 
-        NotificationUser notificationUser = new NotificationUser();
-        notificationUser.setStatus(NotificationStatus.UNREAD);
+
+
 
         for (User user : userList) {
+            NotificationUser notificationUser = new NotificationUser();
             notificationUser.setUser(user);
             notificationUser.setNotification(notification);
+            notificationUser.setStatus(NotificationStatus.UNREAD);
             notificationUserRepository.save(notificationUser);
 
         }
-        return new ApiResponse("Bildirishonomalar muvaffaqiyatli yuborildi!", true, notificationUser);
+        return new ApiResponse("Bildirishonomalar muvaffaqiyatli yuborildi!", true);
     }
 
 
