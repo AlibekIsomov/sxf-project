@@ -1,7 +1,7 @@
 package com.sxf.project.payload;
 
 import com.sxf.project.entity.Notification;
-import com.sxf.project.entity.User;
+import com.sxf.project.entity.NotificationUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +15,5 @@ public class NotificationResponse {
 
     private Notification notification;
 
-    private List<User> users;
+    private List<NotificationUser> notificationUser;
 }

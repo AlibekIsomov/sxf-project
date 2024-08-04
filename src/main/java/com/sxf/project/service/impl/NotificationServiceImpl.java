@@ -79,11 +79,11 @@ public class NotificationServiceImpl implements NotificationService {
         List<NotificationResponse> notificationResponseList = new ArrayList<>();
         List<Notification> notifications = notificationRepository.findAll();
         for (Notification notification : notifications) {
-            List<User> userList = new ArrayList<>();
+            List<NotificationUser> userList = new ArrayList<>();
 
             List<NotificationUser> notificationUserList = notificationUserRepository.findAllByNotificationId(notification.getId());
             for (NotificationUser notificationUser : notificationUserList) {
-                userList.add(notificationUser.getUser());
+                userList.add(notificationUser);
             }
             notificationResponseList.add(new NotificationResponse(notification, userList));
         }
