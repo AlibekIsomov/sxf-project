@@ -43,6 +43,9 @@ jobs:
           SERVER: ${{ secrets.SERVER }}
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
+          port: 22
+          target: "/root/"
+
         run: |
           scp -o StrictHostKeyChecking=no inventory.jar $USERNAME@$SERVER:/root
           ssh $USERNAME@$SERVER 'supervisorctl restart my-programm'
