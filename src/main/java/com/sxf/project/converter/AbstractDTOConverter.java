@@ -1,7 +1,5 @@
 package com.sxf.project.converter;
 
-
-
 import com.sxf.project.dto.BaseDTO;
 import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.DistributedEntity;
@@ -14,19 +12,17 @@ public abstract class AbstractDTOConverter<ENTITY extends DistributedEntity, DTO
 
     public abstract DTO convert(ENTITY entity);
 
-    public void convert(final ENTITY entity, final DTO dto) {
-        UserDTO userDTO = new UserDTO();
+    protected void populateCommonFields(final ENTITY entity, final DTO dto) {
         dto.setId(entity.getId());
         dto.setCreated(entity.getCreated());
         dto.setModified(entity.getModified());
     }
 
     public Page<DTO> convertList(final Page<ENTITY> list){
-        if(list.isEmpty()){
-           return Page.empty();
+        if (list.isEmpty()){
+            return Page.empty();
         }
 
         return new PageImpl<>(list.stream().map(this::convert).collect(Collectors.toList()));
     }
-
 }

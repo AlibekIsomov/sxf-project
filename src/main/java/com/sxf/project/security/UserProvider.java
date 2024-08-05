@@ -3,6 +3,7 @@ package com.sxf.project.security;
 import com.sxf.project.entity.User;
 import com.sxf.project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,14 +18,12 @@ public class UserProvider implements UserDetailsService {
     UserRepository userRepository;
 
     @Override
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            // Assuming UserSpecial implements UserDetails interface
-            return user;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if(optionalUser.isEmpty()){
+            throw new UsernameNotFoundException("User not found");
         }
-        throw new UsernameNotFoundException("User '" + username + "' not found");
+        return optionalUser.get();
     }
 
 //    @Override

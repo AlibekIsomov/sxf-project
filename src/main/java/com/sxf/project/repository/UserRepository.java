@@ -25,4 +25,7 @@ public interface UserRepository extends DistributedRepository<User> {
 
     Optional<Object> findByPhoneNumber(String phoneNumber);
 
+    boolean existsByUsernameAndIdNot(String username, Long id);
+
+    boolean existsByUsername(String username);
 }

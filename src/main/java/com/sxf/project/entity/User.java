@@ -4,20 +4,20 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
-@Entity
-@Table(name = "userser")
+@Entity(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -31,17 +31,17 @@ public class User extends DistributedEntity implements UserDetails, Serializable
     @Column(nullable = false)
     private String surname;
 
-    @Size(max = 30, min = 6)
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Size(max = 60, min = 6)
+    @Size(max = 60, min = 6 )
     @Column(nullable = false)
     private String password;
 
     private String phoneNumber;
 
+    @Enumerated(EnumType.STRING)
     private Role roles;
 
     private Boolean active;
@@ -51,19 +51,9 @@ public class User extends DistributedEntity implements UserDetails, Serializable
     @JsonBackReference
     private Filial assignedFilial;
 
-    public User(String name, String surname, String phoneNumber, String username, Role roles, Filial assignedFilial) {
-        this.name = name;
-        this.surname = surname;
-        this.username = username;
-        this.roles = roles;
-        this.phoneNumber = phoneNumber;
-        this.assignedFilial = assignedFilial;
-    }
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(roles);
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + roles.name()));
     }
 
     @Override

@@ -1,61 +1,44 @@
 package com.sxf.project.entity;
 
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public abstract class DistributedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //    @JsonFormat(pattern = "yyyy.MM.dd.HH.mm")
-//    @DateTimeFormat(pattern = "yyyy.MM.dd.HH.mm")
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @JsonSerialize(using = LocalDateTimeSerializer.class)
-//    private LocalDateTime modified;
-//    private LocalDateTime created;
+
+    @CreatedBy
+    @Column(name = "created_by",  updatable = false)
+    private String createdBy;
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private Instant created;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
     private LocalDateTime modified;
 
-    private LocalDateTime created;
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private String updatedBy;
 
 
-    public boolean isNewEntity() {
-        return this.id == null;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-    public LocalDateTime getModified() {
-        return modified;
-    }
-
-    public void setModified(LocalDateTime modified) {
-        this.modified = modified;
-    }
-
-    public LocalDateTime getCreated() {
-        return created;
-    }
-
-    public void setCreated(LocalDateTime created) {
-        this.created = created;
-    }
 }

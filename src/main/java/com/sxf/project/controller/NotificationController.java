@@ -45,7 +45,7 @@ public class NotificationController {
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<?> getAllNotifications() {
         List<NotificationResponse> notifications = notificationService.getAllNotifications();
@@ -68,9 +68,7 @@ public class NotificationController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
-        notificationService.deleteNotification(id);
-        Optional<Notification> optionalNotification = notificationRepository.findById(id);
-        Notification notification = optionalNotification.get();
-        return ResponseEntity.ok(new ApiResponse("Notification deleted",true, notification));
+        ApiResponse apiResponse = notificationService.deleteNotification(id);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,7 +25,8 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig  {
+@EnableMethodSecurity
+public class SecurityConfig {
 
 
     @Autowired
@@ -37,9 +39,14 @@ public class SecurityConfig  {
     UserRepository userRepository;
 
 
+
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userProvider).passwordEncoder(passwordEncoder());
+    }
 
+    @Bean
+    public JWTFilter jwtAuthenticationFilter() {
+        return new JWTFilter(); // Ensure you have a no-argument constructor or use constructor injection
     }
 
     @Bean
@@ -60,16 +67,31 @@ public class SecurityConfig  {
                 )
                 .exceptionHandling()
                 .and()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return http.build();
     }
+
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf().disable() // Configure CSRF as needed
+//                .authorizeRequests()
+//                .requestMatchers("/**").permitAll() // Permit all requests to auth endpoints
+//                .anyRequest().authenticated() // All other requests need authentication
+//                .and()
+//                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Add custom JWT filter
+//
+//        return http.build();
+//    }
 
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {

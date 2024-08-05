@@ -108,7 +108,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public ApiResponse deleteNotification(Long id) {
+    public ApiResponse  deleteNotification(Long id) {
         Optional<Notification> optionalNotification = notificationRepository.findById(id);
         if (!optionalNotification.isPresent()) {
             return new ApiResponse("Bunday Idlik bildirishnoma yo'q", false);

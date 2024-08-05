@@ -4,6 +4,7 @@ package com.sxf.project.security;
 import com.sxf.project.entity.Role;
 import com.sxf.project.entity.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class UserSpecial implements UserDetails, Serializable {
+    private User user;
 
     private String username;
     private String password;
@@ -30,7 +32,7 @@ public class UserSpecial implements UserDetails, Serializable {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(roles);
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRoles().name()));
     }
 
     @Override

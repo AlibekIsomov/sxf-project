@@ -3,6 +3,7 @@ package com.sxf.project.service;
 
 import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.AccountUpdateDTO;
 import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.vm.UserVM;
 import org.springframework.data.domain.Page;
@@ -10,26 +11,25 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
-public interface UserService extends CommonServiceDto<User, UserDTO> {
-//    public Optional<User> getByIdEntity(Long id);
+public interface UserService {
+    UserDTO getById(Long id);
 
-//    public List<UserDTO> getAll();
-
-//    UserDTO update(User user);
-
-//    public Optional<UserDTO> getById(Long id);
-
-//    UserDTO create(User user);
-
-//    public void deleteById(Long id);
+    Page<UserDTO> getAll(Pageable pageable);
 
     boolean changePassword(UserVM userVM);
 
-    ApiResponse updateUser(Long id, User user);
+
+    ApiResponse accountUpdate(User user , AccountUpdateDTO accountUpdateDTO);
+
+    ApiResponse updateUser(Long id, UserDTO user);
+
+    ApiResponse create(UserDTO user);
 
     UserDTO getCurrentUser();
 
     Optional<User> getByUsername(String login);
 
     Page<User> search(String key, Pageable pageable);
+
+    ApiResponse delete(Long id);
 }

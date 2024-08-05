@@ -65,13 +65,13 @@ public class AccountController {
         return ResponseEntity.ok(new ApiResponse("Muvaffaqiyatli kirildi!", true, token));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody User user) throws Exception {
-        if (user.getId() != null)
-            return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(userService.create(user));
-    }
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @PostMapping("/register")
+//    public ResponseEntity<UserDTO> register(@RequestBody User user) throws Exception {
+//        if (user.getId() == null)
+//            return ResponseEntity.badRequest().build();
+//        return ResponseEntity.ok(userService.create(user));
+//    }
 
 
     @GetMapping("/current-user")
@@ -86,7 +86,6 @@ public class AccountController {
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PutMapping("/password")
     public ResponseEntity<?> updatePassword(@RequestBody UserVM vm) {
-
 
         if (userService.changePassword(vm)) {
 

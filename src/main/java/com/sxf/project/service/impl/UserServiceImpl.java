@@ -3,10 +3,9 @@ package com.sxf.project.service.impl;
 
 import com.sxf.project.converter.AbstractDTOConverter;
 import com.sxf.project.dto.UserDTO;
-import com.sxf.project.entity.Role;
 import com.sxf.project.entity.User;
+import com.sxf.project.payload.AccountUpdateDTO;
 import com.sxf.project.payload.ApiResponse;
-import com.sxf.project.repository.DistributedRepository;
 import com.sxf.project.repository.UserRepository;
 import com.sxf.project.service.UserService;
 import com.sxf.project.vm.UserVM;
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implements UserService {
+public class UserServiceImpl  implements UserService {
 
     @Autowired
     UserRepository userRepository;
@@ -29,22 +28,27 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
     @Autowired
     PasswordEncoder encoder;
 
+    private final AbstractDTOConverter<User, UserDTO> converter;
 
-    public UserServiceImpl(DistributedRepository<User> repository, AbstractDTOConverter<User, UserDTO> converter) {
-        super(repository, converter);
+    public UserServiceImpl(AbstractDTOConverter<User, UserDTO> converter) {
+        this.converter = converter;
+    }
+
+    @Override
+    public UserDTO getById(Long id) {
+        return converter.convert(userRepository.findById(id).orElse(null));
     }
 
 
-    private String getPrincipal() {
-        String userName = null;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    @Override
+    public Page<UserDTO> getAll(Pageable pageable) {
+        Page<User> entity = userRepository.findAll(pageable);
 
-        if (principal instanceof UserDetails) {
-            userName = ((UserDetails) principal).getUsername();
-        } else {
-            userName = principal.toString();
+        if (entity.isEmpty()) {
+            return Page.empty();
         }
-        return userName;
+
+        return converter.convertList(entity);
     }
 
     @Override
@@ -58,27 +62,75 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
             return false;
         }
     }
+
     @Override
-    public ApiResponse updateUser(Long id, User user){
+    public ApiResponse accountUpdate(User user, AccountUpdateDTO accountUpdateDTO){
+
+        boolean existsByUsernameAndIdNot = userRepository.existsByUsernameAndIdNot(accountUpdateDTO.getUsername(),  user.getId());
+        if(existsByUsernameAndIdNot) return new ApiResponse("Bunday usernamelik user tizimda mavjud!",false);
+        user.setName(accountUpdateDTO.getName());
+        user.setSurname(accountUpdateDTO.getSurname());
+        user.setUsername(accountUpdateDTO.getUsername());
+        user.setPhoneNumber(accountUpdateDTO.getPhoneNumber());
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(encoder.encode(user.getPassword()));
+        }
+
+        User savedUser = userRepository.save(user);
+        return new ApiResponse("User muvaffaqiyatli yangilandi" , true, savedUser);
+    }
+
+    @Override
+    public ApiResponse updateUser(Long id, UserDTO user){
         User existingUser = userRepository.findById(id).orElse(null);
         if (existingUser == null) {
             return new ApiResponse("Bunaqa idlik user yo'q" , false);
         }
 
-        // Update fields other than password
+        boolean existsByUsernameAndIdNot = userRepository.existsByUsernameAndIdNot(user.getUsername(),  user.getId());
+        if(existsByUsernameAndIdNot) return new ApiResponse("Bunday usernamelik user tizimda mavjud!",false);
+
         existingUser.setName(user.getName());
         existingUser.setSurname(user.getSurname());
         existingUser.setUsername(user.getUsername());
         existingUser.setPhoneNumber(user.getPhoneNumber());
         existingUser.setRoles(user.getRoles());
 
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            existingUser.setPassword(encoder.encode(user.getPassword()));
+        if (existingUser.getPassword() != null && !existingUser.getPassword().isEmpty()) {
+            existingUser.setPassword(encoder.encode(existingUser.getPassword()));
         }
 
         User savedUser = userRepository.save(existingUser);
-        return new ApiResponse("User muvaffaqiyatli yangilandi" , true, savedUser);
+        UserDTO responseDTO = converter.convert(savedUser);
+        return new ApiResponse("User muvaffaqiyatli yangilandi" , true, responseDTO);
     }
+
+    @Override
+    public ApiResponse create(UserDTO userDTO) {
+        if (userDTO.getPassword() == null || userDTO.getPassword().isEmpty()) {
+            return new ApiResponse("Parol qo'yich majburiy!", false);
+        }
+
+        boolean existsByUsername = userRepository.existsByUsername(userDTO.getUsername());
+        if (existsByUsername) {
+            return new ApiResponse("Bunaqa foydalanuvchi nomi oldindan bor!", false);
+        }
+        User newUser = new User();
+        newUser.setName(userDTO.getName());
+        newUser.setSurname(userDTO.getSurname());
+        newUser.setUsername(userDTO.getUsername());
+        newUser.setPhoneNumber(userDTO.getPhoneNumber());
+        newUser.setRoles(userDTO.getRoles());
+        newUser.setPassword(encoder.encode(userDTO.getPassword()));
+        newUser.setActive(userDTO.getActive() != null ? userDTO.getActive() : false);
+
+        User savedUser = userRepository.save(newUser);
+        UserDTO responseDTO = converter.convert(savedUser);
+        return new ApiResponse("User muvaffaqiyatli yaratildi", true, responseDTO);
+    }
+
+
 
     @Override
     public UserDTO getCurrentUser() {
@@ -86,6 +138,18 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
         if (username != null)
             return userRepository.findByUsername(username).map(UserDTO::new).orElse(null);
         return null;
+    }
+
+        private String getPrincipal() {
+        String userName = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            userName = ((UserDetails) principal).getUsername();
+        } else {
+            userName = principal.toString();
+        }
+        return userName;
     }
 
     @Override
@@ -105,14 +169,14 @@ public class UserServiceImpl extends AbstractDTOService<User, UserDTO> implement
     }
 
     @Override
-    public void someChangesForCreate(User entity) {
-        entity.setPassword(encoder.encode(entity.getPassword()));
-        entity.setRoles(Role.USER);
-        entity.setActive(true);
+    public ApiResponse delete(Long id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (!optionalUser.isPresent()) {
+            return new ApiResponse("Bunday Idlik user yo'q", false);
+        }
+        User user = optionalUser.get();
+        userRepository.deleteById(id);
+        return new ApiResponse("User muvafaqqiyatli o'chirildi", true, user);
     }
 
-    @Override
-    public void someChangesForUpdate(User entity) {
-
-    }
 }

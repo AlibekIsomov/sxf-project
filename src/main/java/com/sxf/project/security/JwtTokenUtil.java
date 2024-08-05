@@ -12,7 +12,7 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class JwtTokenUtil implements Serializable {
+public class JwtTokenUtil  {
 
     private String secret;
     private long jwtExpirationInMs;
