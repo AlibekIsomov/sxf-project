@@ -83,7 +83,7 @@ public class AccountController {
         return ResponseEntity.ok(user);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PutMapping("/password")
     public ResponseEntity<?> updatePassword(@RequestBody UserVM vm) {
 

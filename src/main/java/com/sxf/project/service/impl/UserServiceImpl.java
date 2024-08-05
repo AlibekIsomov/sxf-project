@@ -66,16 +66,23 @@ public class UserServiceImpl  implements UserService {
     @Override
     public ApiResponse accountUpdate(User user, AccountUpdateDTO accountUpdateDTO){
 
-        boolean existsByUsernameAndIdNot = userRepository.existsByUsernameAndIdNot(accountUpdateDTO.getUsername(),  user.getId());
-        if(existsByUsernameAndIdNot) return new ApiResponse("Bunday usernamelik user tizimda mavjud!",false);
+        if (!user.getUsername().equals(accountUpdateDTO.getUsername())) {
+            boolean existsByUsernameAndIdNot = userRepository.existsByUsernameAndIdNot(accountUpdateDTO.getUsername(), user.getId());
+            if (existsByUsernameAndIdNot) {
+                return new ApiResponse("Bunday usernamelik user tizimda mavjud!", false);
+            }
+        }
         user.setName(accountUpdateDTO.getName());
         user.setSurname(accountUpdateDTO.getSurname());
         user.setUsername(accountUpdateDTO.getUsername());
         user.setPhoneNumber(accountUpdateDTO.getPhoneNumber());
 
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            user.setPassword(encoder.encode(user.getPassword()));
+        if (encoder.matches(accountUpdateDTO.getOldPassword(), user.getPassword())) {
+            user.setPassword(encoder.encode(accountUpdateDTO.getNewPassword()));
+        } else {
+            return new ApiResponse("Parolni yangilashda muammo", false);
         }
+
 
         User savedUser = userRepository.save(user);
         return new ApiResponse("User muvaffaqiyatli yangilandi" , true, savedUser);
@@ -96,6 +103,7 @@ public class UserServiceImpl  implements UserService {
         existingUser.setUsername(user.getUsername());
         existingUser.setPhoneNumber(user.getPhoneNumber());
         existingUser.setRoles(user.getRoles());
+
 
         if (existingUser.getPassword() != null && !existingUser.getPassword().isEmpty()) {
             existingUser.setPassword(encoder.encode(existingUser.getPassword()));

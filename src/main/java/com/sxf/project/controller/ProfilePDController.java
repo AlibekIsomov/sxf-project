@@ -46,7 +46,7 @@ public class ProfilePDController {
         return profilePDService.getById(id, currentUser).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     @GetMapping("/filial/{id}")
     public ResponseEntity<?> getProfilePDByFilial(@PathVariable Long id) {

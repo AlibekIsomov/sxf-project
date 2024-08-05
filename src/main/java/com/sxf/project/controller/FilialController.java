@@ -35,20 +35,20 @@ public class FilialController {
     @Autowired
     FilialRepository filialRepository;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     @GetMapping
     public ResponseEntity<Page<Filial>> getAll(Pageable pageable) throws Exception {
         return ResponseEntity.ok(filialService.getAll(pageable));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     @Transactional
     @GetMapping("/{id}")
     public ResponseEntity<Filial> getById(@PathVariable Long id) throws Exception {
         return filialService.getById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody FilialDTO data) throws Exception {
            ApiResponse apiResponse = filialService.create(data);
@@ -64,14 +64,14 @@ public class FilialController {
         return ResponseEntity.ok(filialList);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody FilialDTO data) throws Exception {
         ApiResponse apiResponse = filialService.update(id, data);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("/export")
     public ResponseEntity<InputStreamResource> exportExcel() throws IOException {
         ByteArrayInputStream in = filialService.exportExcel();
@@ -85,20 +85,20 @@ public class FilialController {
                 .body(new InputStreamResource(in));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
         filialService.deleteById(id);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{filialId}/assign-manager/{managerId}")
     public ResponseEntity<?> assignFilialToManager(@PathVariable Long filialId, @PathVariable Long managerId) {
         ApiResponse apiResponse = filialService.assignFilialToManager(filialId ,managerId);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/{managerId}/unassign")
     public ResponseEntity<?> unassignFilialFromManager(@PathVariable Long managerId) {
         ApiResponse apiResponse = filialService.unassignFilialFromManager(managerId);
@@ -106,14 +106,14 @@ public class FilialController {
     }
 
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("getUser/{filialId}")
     public ResponseEntity<Filial> getFilialForUser(@PathVariable Long filialId, @RequestParam Long userId) throws AccessDeniedException {
         Filial filial = filialService.getFilialForUser(filialId, userId);
         return ResponseEntity.ok(filial);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<Filial>> getAllFilials(@RequestParam Long adminId) throws AccessDeniedException {
         List<Filial> filials = filialService.getAllFilialsForAdmin(adminId);

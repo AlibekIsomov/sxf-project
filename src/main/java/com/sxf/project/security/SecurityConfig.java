@@ -46,7 +46,7 @@ public class SecurityConfig {
 
     @Bean
     public JWTFilter jwtAuthenticationFilter() {
-        return new JWTFilter(); // Ensure you have a no-argument constructor or use constructor injection
+        return new JWTFilter();
     }
 
     @Bean

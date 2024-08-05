@@ -31,14 +31,14 @@ public class NotificationController {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public HttpEntity<?> postNotification(@RequestBody NotificationDTO notificationDTO) {
        ApiResponse apiResponse = notificationService.createNotification(notificationDTO);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNotification(@PathVariable Long id, @RequestBody NotificationUpdateDTO notificationDTO) {
         ApiResponse apiResponse = notificationService.updateNotification(id, notificationDTO);
@@ -52,7 +52,7 @@ public class NotificationController {
         return ResponseEntity.ok(new ApiResponse( "All notifications",true, notifications));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     @GetMapping
     public ResponseEntity<?> getNotificationsForUser(@CurrentUser User user) throws Exception {
         List<NotificationUser> notifications = notificationService.getNotificationsForUser(user.getId());
@@ -65,7 +65,7 @@ public class NotificationController {
         return ResponseEntity.ok(count);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
         ApiResponse apiResponse = notificationService.deleteNotification(id);

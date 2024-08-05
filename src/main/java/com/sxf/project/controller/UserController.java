@@ -1,6 +1,5 @@
 package com.sxf.project.controller;
 
-
 import com.sxf.project.dto.UserDTO;
 import com.sxf.project.entity.User;
 import com.sxf.project.payload.AccountUpdateDTO;
@@ -8,6 +7,7 @@ import com.sxf.project.payload.ApiResponse;
 import com.sxf.project.repository.UserRepository;
 import com.sxf.project.security.CurrentUser;
 import com.sxf.project.service.UserService;
+import com.sxf.project.vm.UserVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
 @Controller
 @RestController
@@ -47,7 +46,7 @@ public class UserController  {
 //        return ResponseEntity.ok(userService.getById(id));
 //    }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO user) {
         ApiResponse apiResponse = userService.updateUser(id, user);
@@ -55,14 +54,15 @@ public class UserController  {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/accountEdit")
-    public ResponseEntity<?> accountUpdate(@CurrentUser User user, @RequestBody AccountUpdateDTO accountUpdateDTO) {
+    public ResponseEntity<?> accountUpdate(@CurrentUser User user,
+                                           @RequestBody AccountUpdateDTO accountUpdateDTO) {
         ApiResponse apiResponse = userService.accountUpdate(user, accountUpdateDTO);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody UserDTO user) {
         ApiResponse apiResponse = userService.create(user);
@@ -79,7 +79,7 @@ public class UserController  {
         return ResponseEntity.ok(userService.getAll(pageable));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         ApiResponse apiResponse = userService.delete(id);
